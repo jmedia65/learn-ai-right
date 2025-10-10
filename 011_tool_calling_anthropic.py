@@ -255,100 +255,151 @@ tools_multi = [
 #     print(f"\nClaude's answer: {final_response.content[0].text}")
 
 # ============================================================================
+# print("\n" + "=" * 80)
+# print("EXAMPLE 3: MULTI-TURN TOOL CONVERSATION")
+# print("=" * 80)
+
+# print(
+#     """
+# Sometimes Claude needs multiple tools to answer one question.
+# Example: "Get user_123's info and tell me if they're from a warm city"
+
+# This requires:
+# 1. Call get_user_info("user_123")
+# 2. Call get_weather(city_from_user_info)
+# 3. Answer based on both results
+
+# Let's see this in action...
+# """
+# )
+
+
+# def process_tool_call(tool_name: str, tool_input: dict):
+#     """Helper function to route tool calls to the right function."""
+#     if tool_name == "get_user_info":
+#         return get_user_info(tool_input["user_id"])
+#     elif tool_name == "get_weather":
+#         return get_weather(tool_input["location"])
+#     elif tool_name == "add":
+#         return add(tool_input["a"], tool_input["b"])
+#     elif tool_name == "multiply":
+#         return multiply(tool_input["a"], tool_input["b"])
+#     else:
+#         return {"error": f"Unknown tool: {tool_name}"}
+
+
+# # Combine all tools
+# all_tools = tools + tools_multi  # weather + calculator + user_info
+
+# print("\nUser asks: 'Get info for user_123 and tell me their city's weather'\n")
+
+# messages = [
+#     {
+#         "role": "user",
+#         "content": "Get info for user_123 and tell me about their city's weather",
+#     }
+# ]
+
+# # Loop to handle multiple tool calls
+# max_iterations = 5  # Prevent infinite loops
+# for iteration in range(max_iterations):
+#     print(f"\n--- Iteration {iteration + 1} ---")
+
+#     response = client.messages.create(
+#         model="claude-sonnet-4-20250514",
+#         max_tokens=1024,
+#         tools=all_tools,
+#         messages=messages,
+#     )
+
+#     print(f"Stop reason: {response.stop_reason}")
+
+#     if response.stop_reason == "tool_use":
+#         # Add Claude's response to conversation
+#         messages.append({"role": "assistant", "content": response.content})
+
+#         # Process all tool uses in this response
+#         tool_results = []
+
+#         for block in response.content:
+#             if block.type == "tool_use":
+#                 print(f"\nClaude wants to use: {block.name}")
+#                 print(f"Parameters: {json.dumps(block.input, indent=2)}")
+
+#                 # Execute the tool
+#                 result = process_tool_call(block.name, block.input)
+#                 print(f"Result: {json.dumps(result, indent=2)}")
+
+#                 # Collect result
+#                 tool_results.append(
+#                     {
+#                         "type": "tool_result",
+#                         "tool_use_id": block.id,
+#                         "content": json.dumps(result),
+#                     }
+#                 )
+
+#         # Add all tool results to conversation
+#         messages.append({"role": "user", "content": tool_results})
+
+#     elif response.stop_reason == "end_turn":
+#         # Claude is done using tools, has final answer
+#         print("\n✓ Claude has finished using tools!")
+#         print(f"\nFinal answer: {response.content[0].text}")
+#         break
+#     else:
+#         print(f"\nUnexpected stop reason: {response.stop_reason}")
+#         break
+
+# ============================================================================
 print("\n" + "=" * 80)
-print("EXAMPLE 3: MULTI-TURN TOOL CONVERSATION")
+print("EXAMPLE 4: REAL-WORLD PATTERN - TOOL LOOP")
 print("=" * 80)
 
 print(
     """
-Sometimes Claude needs multiple tools to answer one question.
-Example: "Get user_123's info and tell me if they're from a warm city"
+Here's the production-ready pattern for handling tools:
 
-This requires:
-1. Call get_user_info("user_123") 
-2. Call get_weather(city_from_user_info)
-3. Answer based on both results
-
-Let's see this in action...
-"""
-)
-
-
-def process_tool_call(tool_name: str, tool_input: dict):
-    """Helper function to route tool calls to the right function."""
-    if tool_name == "get_user_info":
-        return get_user_info(tool_input["user_id"])
-    elif tool_name == "get_weather":
-        return get_weather(tool_input["location"])
-    elif tool_name == "add":
-        return add(tool_input["a"], tool_input["b"])
-    elif tool_name == "multiply":
-        return multiply(tool_input["a"], tool_input["b"])
-    else:
-        return {"error": f"Unknown tool: {tool_name}"}
-
-
-# Combine all tools
-all_tools = tools + tools_multi  # weather + calculator + user_info
-
-print("\nUser asks: 'Get info for user_123 and tell me their city's weather'\n")
-
-messages = [
-    {
-        "role": "user",
-        "content": "Get info for user_123 and tell me about their city's weather",
-    }
-]
-
-# Loop to handle multiple tool calls
-max_iterations = 5  # Prevent infinite loops
-for iteration in range(max_iterations):
-    print(f"\n--- Iteration {iteration + 1} ---")
-
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        tools=all_tools,
-        messages=messages,
-    )
-
-    print(f"Stop reason: {response.stop_reason}")
-
-    if response.stop_reason == "tool_use":
-        # Add Claude's response to conversation
-        messages.append({"role": "assistant", "content": response.content})
-
-        # Process all tool uses in this response
-        tool_results = []
-
-        for block in response.content:
-            if block.type == "tool_use":
-                print(f"\nClaude wants to use: {block.name}")
-                print(f"Parameters: {json.dumps(block.input, indent=2)}")
-
-                # Execute the tool
-                result = process_tool_call(block.name, block.input)
-                print(f"Result: {json.dumps(result, indent=2)}")
-
-                # Collect result
-                tool_results.append(
-                    {
+def chat_with_tools(user_message: str, tools: list, conversation_history: list):
+    # Add user message
+    conversation_history.append({"role": "user", "content": user_message})
+    
+    # Loop until Claude stops using tools
+    while True:
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            tools=tools,
+            messages=conversation_history
+        )
+        
+        if response.stop_reason == "tool_use":
+            # Add assistant's tool request
+            conversation_history.append({"role": "assistant", "content": response.content})
+            
+            # Execute tools and collect results
+            tool_results = []
+            for block in response.content:
+                if block.type == "tool_use":
+                    result = execute_tool(block.name, block.input)
+                    tool_results.append({
                         "type": "tool_result",
                         "tool_use_id": block.id,
-                        "content": json.dumps(result),
-                    }
-                )
-
-        # Add all tool results to conversation
-        messages.append({"role": "user", "content": tool_results})
-
-    elif response.stop_reason == "end_turn":
-        # Claude is done using tools, has final answer
-        print("\n✓ Claude has finished using tools!")
-        print(f"\nFinal answer: {response.content[0].text}")
-        break
-    else:
-        print(f"\nUnexpected stop reason: {response.stop_reason}")
-        break
-
-# ============================================================================
+                        "content": json.dumps(result)
+                    })
+            
+            # Add results
+            conversation_history.append({"role": "user", "content": tool_results})
+            
+        else:  # end_turn or max_tokens
+            # Claude is done
+            conversation_history.append({"role": "assistant", "content": response.content})
+            return response.content[0].text
+            
+This pattern handles:
+- Single tool calls
+- Multiple tool calls
+- Multi-turn tool conversations
+- Conversation history
+"""
+)

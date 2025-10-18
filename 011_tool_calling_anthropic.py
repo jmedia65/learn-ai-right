@@ -71,70 +71,70 @@ tools = [
     }
 ]
 
-# # STEP 3: Make the API call with tools
-# print("\nUser asks: 'What's the weather in Miami?'\n")
+# STEP 3: Make the API call with tools
+print("\nUser asks: 'What's the weather in Miami?'\n")
 
-# response = client.messages.create(
-#     model="claude-sonnet-4-20250514",
-#     max_tokens=1024,
-#     tools=tools,  # Pass the tools to Claude
-#     messages=[{"role": "user", "content": "What's the weather in Miami?"}],
-# )
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1024,
+    tools=tools,  # Pass the tools to Claude
+    messages=[{"role": "user", "content": "What's the weather in Miami?"}],
+)
 
-# print("Claude's response:")
-# print(
-#     f"Stop reason: {response.stop_reason}"
-# )  # Will be "tool_use" if Claude wants to use a tool
+print("Claude's response:")
+print(
+    f"Stop reason: {response.stop_reason}"
+)  # Will be "tool_use" if Claude wants to use a tool
 
-# # STEP 4: Check if Claude wants to use a tool
-# if response.stop_reason == "tool_use":
-#     print("\n✓ Claude wants to use a tool!")
+# STEP 4: Check if Claude wants to use a tool
+if response.stop_reason == "tool_use":
+    print("\n✓ Claude wants to use a tool!")
 
-#     # Extract the tool use request
-#     # response.content is a list, find the tool_use block
-#     tool_use_block = None
-#     for block in response.content:
-#         if block.type == "tool_use":
-#             tool_use_block = block
-#             break
+    # Extract the tool use request
+    # response.content is a list, find the tool_use block
+    tool_use_block = None
+    for block in response.content:
+        if block.type == "tool_use":
+            tool_use_block = block
+            break
 
-#     if tool_use_block:
-#         print(f"\nTool requested: {tool_use_block.name}")
-#         print(f"Tool parameters: {json.dumps(tool_use_block.input, indent=2)}")
+    if tool_use_block:
+        print(f"\nTool requested: {tool_use_block.name}")
+        print(f"Tool parameters: {json.dumps(tool_use_block.input, indent=2)}")
 
-#     # STEP 5: Execute YOUR function
-#     location = tool_use_block.input["location"]
-#     weather_result = get_weather(location)
+    # STEP 5: Execute YOUR function
+    location = tool_use_block.input["location"]
+    weather_result = get_weather(location)
 
-#     print(f"\nExecuting get_weather('{location}')...")
-#     print(f"Result: {json.dumps(weather_result, indent=2)}")
+    print(f"\nExecuting get_weather('{location}')...")
+    print(f"Result: {json.dumps(weather_result, indent=2)}")
 
-#     # STEP 6: Send the result back to Claude
-#     print("\nSending result back to Claude...\n")
+    # STEP 6: Send the result back to Claude
+    print("\nSending result back to Claude...\n")
 
-#     final_response = client.messages.create(
-#         model="claude-sonnet-4-20250514",
-#         max_tokens=1024,
-#         tools=tools,
-#         messages=[
-#             {"role": "user", "content": "What's the weather in Miami?"},
-#             {"role": "assistant", "content": response.content},  # Claude's tool request
-#             {
-#                 "role": "user",
-#                 "content": [
-#                     {
-#                         "type": "tool_result",
-#                         "tool_use_id": tool_use_block.id,  # Must match the tool_use id
-#                         "content": json.dumps(weather_result),  # Your function's result
-#                     }
-#                 ],
-#             },
-#         ],
-#     )
+    final_response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1024,
+        tools=tools,
+        messages=[
+            {"role": "user", "content": "What's the weather in Miami?"},
+            {"role": "assistant", "content": response.content},  # Claude's tool request
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use_block.id,  # Must match the tool_use id
+                        "content": json.dumps(weather_result),  # Your function's result
+                    }
+                ],
+            },
+        ],
+    )
 
-#     # STEP 7: Claude now has the data and can answer
-#     print("Claude's final answer:")
-#     print(final_response.content[0].text)
+    # STEP 7: Claude now has the data and can answer
+    print("Claude's final answer:")
+    print(final_response.content[0].text)
 
 # ============================================================================
 print("\n" + "=" * 80)
@@ -204,152 +204,152 @@ tools_multi = [
     },
 ]
 
-# print("\nUser asks: 'What's 15 multiplied by 23?'\n")
+print("\nUser asks: 'What's 15 multiplied by 23?'\n")
 
-# response = client.messages.create(
-#     model="claude-sonnet-4-20250514",
-#     max_tokens=1024,
-#     tools=tools_multi,
-#     messages=[{"role": "user", "content": "What's 15 multiplied by 23?"}],
-# )
+response = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1024,
+    tools=tools_multi,
+    messages=[{"role": "user", "content": "What's 15 multiplied by 23?"}],
+)
 
-# # THIS IS THE KEY - THE IF STATEMENT
-# if response.stop_reason == "tool_use":
-#     print("✓ Claude wants to use a tool!")
+# THIS IS THE KEY - THE IF STATEMENT
+if response.stop_reason == "tool_use":
+    print("✓ Claude wants to use a tool!")
 
-#     # Find the tool use block
-#     tool_use = next(block for block in response.content if block.type == "tool_use")
+    # Find the tool use block
+    tool_use = next(block for block in response.content if block.type == "tool_use")
 
-#     print(f"\nTool: {tool_use.name}")
-#     print(f"Parameters: {json.dumps(tool_use.input, indent=2)}")
+    print(f"\nTool: {tool_use.name}")
+    print(f"Parameters: {json.dumps(tool_use.input, indent=2)}")
 
-#     # Execute the appropriate function
-#     if tool_use.name == "multiply":
-#         result = multiply(tool_use.input["a"], tool_use.input["b"])
-#     elif tool_use.name == "add":
-#         result = add(tool_use.input["a"], tool_use.input["b"])
+    # Execute the appropriate function
+    if tool_use.name == "multiply":
+        result = multiply(tool_use.input["a"], tool_use.input["b"])
+    elif tool_use.name == "add":
+        result = add(tool_use.input["a"], tool_use.input["b"])
 
-#     print(f"Result: {result}")
+    print(f"Result: {result}")
 
-#     # Send result back
-#     final_response = client.messages.create(
-#         model="claude-sonnet-4-20250514",
-#         max_tokens=1024,
-#         tools=tools_multi,
-#         messages=[
-#             {"role": "user", "content": "What's 15 multiplied by 23?"},
-#             {"role": "assistant", "content": response.content},
-#             {
-#                 "role": "user",
-#                 "content": [
-#                     {
-#                         "type": "tool_result",
-#                         "tool_use_id": tool_use.id,
-#                         "content": str(result),
-#                     }
-#                 ],
-#             },
-#         ],
-#     )
+    # Send result back
+    final_response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1024,
+        tools=tools_multi,
+        messages=[
+            {"role": "user", "content": "What's 15 multiplied by 23?"},
+            {"role": "assistant", "content": response.content},
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use.id,
+                        "content": str(result),
+                    }
+                ],
+            },
+        ],
+    )
 
-#     print(f"\nClaude's answer: {final_response.content[0].text}")
+    print(f"\nClaude's answer: {final_response.content[0].text}")
 
 # ============================================================================
-# print("\n" + "=" * 80)
-# print("EXAMPLE 3: MULTI-TURN TOOL CONVERSATION")
-# print("=" * 80)
+print("\n" + "=" * 80)
+print("EXAMPLE 3: MULTI-TURN TOOL CONVERSATION")
+print("=" * 80)
 
-# print(
-#     """
-# Sometimes Claude needs multiple tools to answer one question.
-# Example: "Get user_123's info and tell me if they're from a warm city"
+print(
+    """
+Sometimes Claude needs multiple tools to answer one question.
+Example: "Get user_123's info and tell me if they're from a warm city"
 
-# This requires:
-# 1. Call get_user_info("user_123")
-# 2. Call get_weather(city_from_user_info)
-# 3. Answer based on both results
+This requires:
+1. Call get_user_info("user_123")
+2. Call get_weather(city_from_user_info)
+3. Answer based on both results
 
-# Let's see this in action...
-# """
-# )
-
-
-# def process_tool_call(tool_name: str, tool_input: dict):
-#     """Helper function to route tool calls to the right function."""
-#     if tool_name == "get_user_info":
-#         return get_user_info(tool_input["user_id"])
-#     elif tool_name == "get_weather":
-#         return get_weather(tool_input["location"])
-#     elif tool_name == "add":
-#         return add(tool_input["a"], tool_input["b"])
-#     elif tool_name == "multiply":
-#         return multiply(tool_input["a"], tool_input["b"])
-#     else:
-#         return {"error": f"Unknown tool: {tool_name}"}
+Let's see this in action...
+"""
+)
 
 
-# # Combine all tools
-# all_tools = tools + tools_multi  # weather + calculator + user_info
+def process_tool_call(tool_name: str, tool_input: dict):
+    """Helper function to route tool calls to the right function."""
+    if tool_name == "get_user_info":
+        return get_user_info(tool_input["user_id"])
+    elif tool_name == "get_weather":
+        return get_weather(tool_input["location"])
+    elif tool_name == "add":
+        return add(tool_input["a"], tool_input["b"])
+    elif tool_name == "multiply":
+        return multiply(tool_input["a"], tool_input["b"])
+    else:
+        return {"error": f"Unknown tool: {tool_name}"}
 
-# print("\nUser asks: 'Get info for user_123 and tell me their city's weather'\n")
 
-# messages = [
-#     {
-#         "role": "user",
-#         "content": "Get info for user_123 and tell me about their city's weather",
-#     }
-# ]
+# Combine all tools
+all_tools = tools + tools_multi  # weather + calculator + user_info
 
-# # Loop to handle multiple tool calls
-# max_iterations = 5  # Prevent infinite loops
-# for iteration in range(max_iterations):
-#     print(f"\n--- Iteration {iteration + 1} ---")
+print("\nUser asks: 'Get info for user_123 and tell me their city's weather'\n")
 
-#     response = client.messages.create(
-#         model="claude-sonnet-4-20250514",
-#         max_tokens=1024,
-#         tools=all_tools,
-#         messages=messages,
-#     )
+messages = [
+    {
+        "role": "user",
+        "content": "Get info for user_123 and tell me about their city's weather",
+    }
+]
 
-#     print(f"Stop reason: {response.stop_reason}")
+# Loop to handle multiple tool calls
+max_iterations = 5  # Prevent infinite loops
+for iteration in range(max_iterations):
+    print(f"\n--- Iteration {iteration + 1} ---")
 
-#     if response.stop_reason == "tool_use":
-#         # Add Claude's response to conversation
-#         messages.append({"role": "assistant", "content": response.content})
+    response = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1024,
+        tools=all_tools,
+        messages=messages,
+    )
 
-#         # Process all tool uses in this response
-#         tool_results = []
+    print(f"Stop reason: {response.stop_reason}")
 
-#         for block in response.content:
-#             if block.type == "tool_use":
-#                 print(f"\nClaude wants to use: {block.name}")
-#                 print(f"Parameters: {json.dumps(block.input, indent=2)}")
+    if response.stop_reason == "tool_use":
+        # Add Claude's response to conversation
+        messages.append({"role": "assistant", "content": response.content})
 
-#                 # Execute the tool
-#                 result = process_tool_call(block.name, block.input)
-#                 print(f"Result: {json.dumps(result, indent=2)}")
+        # Process all tool uses in this response
+        tool_results = []
 
-#                 # Collect result
-#                 tool_results.append(
-#                     {
-#                         "type": "tool_result",
-#                         "tool_use_id": block.id,
-#                         "content": json.dumps(result),
-#                     }
-#                 )
+        for block in response.content:
+            if block.type == "tool_use":
+                print(f"\nClaude wants to use: {block.name}")
+                print(f"Parameters: {json.dumps(block.input, indent=2)}")
 
-#         # Add all tool results to conversation
-#         messages.append({"role": "user", "content": tool_results})
+                # Execute the tool
+                result = process_tool_call(block.name, block.input)
+                print(f"Result: {json.dumps(result, indent=2)}")
 
-#     elif response.stop_reason == "end_turn":
-#         # Claude is done using tools, has final answer
-#         print("\n✓ Claude has finished using tools!")
-#         print(f"\nFinal answer: {response.content[0].text}")
-#         break
-#     else:
-#         print(f"\nUnexpected stop reason: {response.stop_reason}")
-#         break
+                # Collect result
+                tool_results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": json.dumps(result),
+                    }
+                )
+
+        # Add all tool results to conversation
+        messages.append({"role": "user", "content": tool_results})
+
+    elif response.stop_reason == "end_turn":
+        # Claude is done using tools, has final answer
+        print("\n✓ Claude has finished using tools!")
+        print(f"\nFinal answer: {response.content[0].text}")
+        break
+    else:
+        print(f"\nUnexpected stop reason: {response.stop_reason}")
+        break
 
 # ============================================================================
 print("\n" + "=" * 80)

@@ -10,26 +10,39 @@ LLMs like Claude and GPT are stateless—they have no memory between API calls. 
 
 - How chatbots "remember" previous messages (spoiler: they don't, you do)
 - The five-step pattern for multi-turn conversations
-- How to build a simple chat loop with persistent memory
+- How to build both scripted and interactive chat experiences
 - Why conversations get more expensive as they get longer
 
 ## Files in This Module
 
-- [01_anthropic_conversation.py](./01_anthropic_conversation.py) - Multi-turn conversation with Claude
-- [02_openai_conversation.py](./02_openai_conversation.py) - Multi-turn conversation with GPT
+### Part 1: Turn-by-Turn Conversations (Scripted Examples)
+These examples show 4 hardcoded conversation turns to demonstrate the pattern clearly:
 
-Both examples demonstrate the same pattern: append user message → send full history → extract response → append assistant message → repeat.
+- [01_anthropic_conversation.py](./01_anthropic_conversation.py) - Multi-turn conversation with Claude (4 scripted turns)
+- [02_openai_conversation.py](./02_openai_conversation.py) - Multi-turn conversation with GPT (4 scripted turns)
+
+### Part 2: Interactive Chat Loops (Practical Application)
+These examples wrap the same pattern in a `while` loop for real-time interaction:
+
+- [03_anthropic_while_loop.py](./03_anthropic_while_loop.py) - Interactive chat with Claude (user input)
+- [04_openai_while_loop.py](./04_openai_while_loop.py) - Interactive chat with GPT (user input)
+
+**Learning Path:** Start with files 01-02 to understand the pattern, then try files 03-04 to see it in action.
 
 ## Key Takeaway
 
 Every chatbot, from ChatGPT to custom applications, follows this simple loop:
+
 1. Append user message to history list
 2. Send entire history to API
 3. Extract the response
 4. Display it
 5. Append assistant message to history
 
-Wrap that in a `while True:` loop and you have a chatbot.
+**Turn-by-turn examples:** Pattern repeated 4 times with hardcoded messages
+**While loop examples:** Pattern wrapped in `while True:` with user input
+
+That's it. No magic. Just a Python list and sequential API calls.
 
 ## Read the Full Article
 

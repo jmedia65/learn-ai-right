@@ -30,9 +30,7 @@ print("Claude (non-streaming): ", end="", flush=True)
 response = client.messages.create(
     model="claude-sonnet-4-20250514",
     max_tokens=1024,
-    messages=[
-        {"role": "user", "content": "Explain Python in two sentences."}
-    ],
+    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 )
 
 # All text arrives at once
@@ -55,9 +53,7 @@ print("Claude (streaming): ", end="", flush=True)
 with client.messages.stream(
     model="claude-sonnet-4-20250514",
     max_tokens=1024,
-    messages=[
-        {"role": "user", "content": "Explain Python in two sentences."}
-    ],
+    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 ) as stream:
     # stream.text_stream yields chunks as they arrive
     for chunk in stream.text_stream:

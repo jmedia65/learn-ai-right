@@ -123,11 +123,11 @@ Instructions:
     # STEP 4: Build full messages array
     # OpenAI requires system message to be IN the messages array
     # We rebuild it each turn with fresh documents
-    messages = [
-        {"role": "system", "content": system_message_content}
-    ] + conversation_history + [
-        {"role": "user", "content": question}
-    ]
+    messages = (
+        [{"role": "system", "content": system_message_content}]
+        + conversation_history
+        + [{"role": "user", "content": question}]
+    )
 
     # STEP 5: Call GPT
     print("🤖 Asking GPT...\n")
@@ -156,9 +156,9 @@ Instructions:
 conversation_history = []
 
 # TURN 1: Initial question
-print("="*80)
+print("=" * 80)
 print("TURN 1")
-print("="*80)
+print("=" * 80)
 
 question1 = "What is FastAPI?"
 answer1, conversation_history = conversational_rag(
@@ -170,9 +170,9 @@ print(f"GPT: {answer1}")
 print(f"{'='*80}\n")
 
 # TURN 2: Follow-up question using pronoun "it"
-print("="*80)
+print("=" * 80)
 print("TURN 2")
-print("="*80)
+print("=" * 80)
 
 question2 = "Who created it?"
 answer2, conversation_history = conversational_rag(
@@ -184,9 +184,9 @@ print(f"GPT: {answer2}")
 print(f"{'='*80}\n")
 
 # TURN 3: Another follow-up
-print("="*80)
+print("=" * 80)
 print("TURN 3")
-print("="*80)
+print("=" * 80)
 
 question3 = "What is it built on top of?"
 answer3, conversation_history = conversational_rag(

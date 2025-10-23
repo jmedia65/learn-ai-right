@@ -22,12 +22,12 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Step 2: Call the API
 # Send a messages array to GPT
 response = client.chat.completions.create(
-    model="gpt-4o",                    # Which AI model to use
-    max_tokens=1024,                   # Maximum length of response (~750-1000 words)
+    model="gpt-4o",  # Which AI model to use
+    max_tokens=1024,  # Maximum length of response (~750-1000 words)
     messages=[
         {
-            "role": "user",            # Who is speaking (user or assistant)
-            "content": "Explain what an API is in one sentence."  # What you're asking
+            "role": "user",  # Who is speaking (user or assistant)
+            "content": "Explain what an API is in one sentence.",  # What you're asking
         }
     ],
 )
@@ -46,11 +46,13 @@ print("=" * 80)
 # Display metadata about the API call
 # This information helps you track costs and debug issues
 print("\nRESPONSE METADATA:")
-print(f"Model used: {response.model}")                           # Confirms which model answered
-print(f"Finish reason: {response.choices[0].finish_reason}")    # Why the response ended (usually "stop")
-print(f"Input tokens: {response.usage.prompt_tokens}")          # Tokens in your prompt
-print(f"Output tokens: {response.usage.completion_tokens}")     # Tokens in GPT's response
-print(f"Total tokens: {response.usage.total_tokens}")           # Sum of input + output
+print(f"Model used: {response.model}")  # Confirms which model answered
+print(
+    f"Finish reason: {response.choices[0].finish_reason}"
+)  # Why the response ended (usually "stop")
+print(f"Input tokens: {response.usage.prompt_tokens}")  # Tokens in your prompt
+print(f"Output tokens: {response.usage.completion_tokens}")  # Tokens in GPT's response
+print(f"Total tokens: {response.usage.total_tokens}")  # Sum of input + output
 
 """
 WHAT YOU JUST LEARNED:

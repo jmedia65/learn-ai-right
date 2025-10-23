@@ -41,7 +41,7 @@ while True:
     response = client.chat.completions.create(
         model="gpt-4o",
         max_tokens=1024,
-        messages=conversation_history  # <-- The entire history every time
+        messages=conversation_history,  # <-- The entire history every time
     )
 
     # Step 3: Extract GPT's response

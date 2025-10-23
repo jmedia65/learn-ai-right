@@ -23,11 +23,11 @@ client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 # Send a messages array to Claude
 response = client.messages.create(
     model="claude-sonnet-4-20250514",  # Which AI model to use
-    max_tokens=1024,                   # Maximum length of response (~750-1000 words)
+    max_tokens=1024,  # Maximum length of response (~750-1000 words)
     messages=[
         {
-            "role": "user",            # Who is speaking (user or assistant)
-            "content": "Explain what an API is in one sentence."  # What you're asking
+            "role": "user",  # Who is speaking (user or assistant)
+            "content": "Explain what an API is in one sentence.",  # What you're asking
         }
     ],
 )
@@ -46,9 +46,11 @@ print("=" * 80)
 # Display metadata about the API call
 # This information helps you track costs and debug issues
 print("\nRESPONSE METADATA:")
-print(f"Model used: {response.model}")              # Confirms which model answered
-print(f"Stop reason: {response.stop_reason}")       # Why the response ended (usually "end_turn")
-print(f"Input tokens: {response.usage.input_tokens}")    # Tokens in your prompt
+print(f"Model used: {response.model}")  # Confirms which model answered
+print(
+    f"Stop reason: {response.stop_reason}"
+)  # Why the response ended (usually "end_turn")
+print(f"Input tokens: {response.usage.input_tokens}")  # Tokens in your prompt
 print(f"Output tokens: {response.usage.output_tokens}")  # Tokens in Claude's response
 
 """

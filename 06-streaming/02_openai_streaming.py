@@ -27,9 +27,7 @@ print("GPT (non-streaming): ", end="", flush=True)
 response = client.chat.completions.create(
     model="gpt-4o",
     max_tokens=1024,
-    messages=[
-        {"role": "user", "content": "Explain Python in two sentences."}
-    ],
+    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 )
 
 # All text arrives at once
@@ -53,9 +51,7 @@ stream = client.chat.completions.create(
     model="gpt-4o",
     max_tokens=1024,
     stream=True,  # This enables streaming!
-    messages=[
-        {"role": "user", "content": "Explain Python in two sentences."}
-    ],
+    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 )
 
 # Iterate through chunks

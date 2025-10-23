@@ -91,9 +91,7 @@ print(f"User: {user_message_3}")
 
 # Send the ENTIRE history (now 5 messages)
 response_3 = client.messages.create(
-    model="claude-sonnet-4-20250514",
-    max_tokens=1024,
-    messages=conversation_history
+    model="claude-sonnet-4-20250514", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_3 = response_3.content[0].text
@@ -115,9 +113,7 @@ conversation_history.append({"role": "user", "content": user_message_4})
 print(f"User: {user_message_4}")
 
 response_4 = client.messages.create(
-    model="claude-sonnet-4-20250514",
-    max_tokens=1024,
-    messages=conversation_history
+    model="claude-sonnet-4-20250514", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_4 = response_4.content[0].text

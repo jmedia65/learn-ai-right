@@ -41,7 +41,7 @@ while True:
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1024,
-        messages=conversation_history  # <-- The entire history every time
+        messages=conversation_history,  # <-- The entire history every time
     )
 
     # Step 3: Extract Claude's response

@@ -220,31 +220,31 @@ Be friendly, helpful, and provide actionable next steps.""",
 # =============================================================================
 
 # Example 1: Linear chain
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("EXAMPLE 1: LINEAR CHAIN (Research → Write → Edit)")
-print("="*80)
+print("=" * 80)
 
 article = research_write_edit("FastAPI for building APIs")
 
-print("="*80)
+print("=" * 80)
 print("FINAL ARTICLE:")
-print("="*80)
+print("=" * 80)
 print(article)
-print("="*80)
+print("=" * 80)
 
 # Example 2: Conditional chain
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("EXAMPLE 2: CONDITIONAL CHAIN (Classify → Branch)")
-print("="*80)
+print("=" * 80)
 
 request1 = "The login button is broken on mobile devices"
 response1 = handle_support_request(request1)
 
-print("="*80)
+print("=" * 80)
 print("RESPONSE:")
-print("="*80)
+print("=" * 80)
 print(response1)
-print("="*80)
+print("=" * 80)
 
 """
 WHAT YOU JUST LEARNED:

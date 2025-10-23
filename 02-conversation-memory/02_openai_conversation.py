@@ -93,9 +93,7 @@ print(f"User: {user_message_3}")
 
 # Send the ENTIRE history (now 5 messages)
 response_3 = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
-    messages=conversation_history
+    model="gpt-4o", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_3 = response_3.choices[0].message.content
@@ -117,9 +115,7 @@ conversation_history.append({"role": "user", "content": user_message_4})
 print(f"User: {user_message_4}")
 
 response_4 = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
-    messages=conversation_history
+    model="gpt-4o", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_4 = response_4.choices[0].message.content

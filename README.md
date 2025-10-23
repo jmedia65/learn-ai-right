@@ -13,6 +13,7 @@ This course fills that gap. It teaches you what AI systems actually do, stripped
 **Frameworks have their place.** I use them. I like several of them. But jumping into a framework without understanding the fundamentals is inefficient. You build on shaky ground.
 
 This course teaches you what's really happening when you:
+
 - Chat with an AI
 - Give it memory
 - Make it use tools
@@ -25,14 +26,14 @@ Once you understand these patterns, you can use any framework effectively—or b
 
 The industry loves complex terminology. Here's what things really are:
 
-| Industry Term | What It Actually Is |
-|--------------|-------------------|
-| **AI Agents** | Python functions the AI decides to call |
-| **Memory/Context** | A Python list of messages you send with each request |
-| **RAG (Retrieval Augmented Generation)** | Search for relevant text + add to prompt + ask AI |
-| **Multi-Agent Systems** | Sequential API calls with logic between them |
-| **Embeddings/Vector DBs** | Useful for large datasets, but keyword search works fine for most cases |
-| **Prompt Chaining** | Call AI → process result → call AI again |
+| Industry Term                            | What It Actually Is                                                     |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| **AI Agents**                            | Python functions the AI decides to call                                 |
+| **Memory/Context**                       | A Python list of messages you send with each request                    |
+| **RAG (Retrieval Augmented Generation)** | Search for relevant text + add to prompt + ask AI                       |
+| **Multi-Agent Systems**                  | Sequential API calls with logic between them                            |
+| **Embeddings/Vector DBs**                | Useful for large datasets, but keyword search works fine for most cases |
+| **Prompt Chaining**                      | Call AI → process result → call AI again                                |
 
 That's it. No magic. Just API calls and basic programming.
 
@@ -61,12 +62,14 @@ If you can write functions, loops, and understand lists and dictionaries, you're
 ## Quick Start
 
 **1. Clone this repository**
+
 ```bash
-git clone https://github.com/yourusername/learn-ai-right.git
+git clone https://github.com/jmedia65/learn-ai-right.git
 cd learn-ai-right
 ```
 
 **2. Install dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -74,21 +77,25 @@ pip install -r requirements.txt
 **3. Set up your API keys**
 
 Copy `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 Add your API keys to `.env`:
+
 ```
 ANTHROPIC_API_KEY=your_anthropic_key_here
 OPENAI_API_KEY=your_openai_key_here
 ```
 
 Get API keys:
+
 - Anthropic: https://console.anthropic.com/
 - OpenAI: https://platform.openai.com/api-keys
 
 **4. Start with the first module**
+
 ```bash
 cd 01-your-first-ai-call
 python 01_anthropic_basic.py
@@ -97,6 +104,7 @@ python 01_anthropic_basic.py
 ## Course Structure
 
 Each module contains:
+
 - A README explaining the concept
 - Python examples for Anthropic Claude
 - Python examples for OpenAI GPT
@@ -105,36 +113,43 @@ Each module contains:
 Work through them in order:
 
 ### [01 - Your First AI Call](./01-your-first-ai-call)
+
 Learn the foundational pattern: initialize → call → extract response.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/your-first-ai-call-the-foundation-of-everything)
 
 ### [02 - Conversation Memory](./02-conversation-memory)
+
 Understand how chatbots remember context (spoiler: it's just a list).
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)
 
 ### [03 - Tool Calling](./03-tool-calling)
+
 Make AI take actions by calling your Python functions.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/tool-calling-making-ai-do-things)
 
 ### [04 - RAG](./04-rag)
+
 Make AI answer questions from your own documents.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/rag-making-ai-answer-from-your-documents)
 
 ### [05 - Conversational RAG](./05-conversational-rag)
+
 Add follow-up questions to your document Q&A system.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/conversational-rag-adding-follow-up-questions)
 
 ### [06 - Streaming](./06-streaming)
+
 Display AI responses in real-time, word by word.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/streaming-responses-making-ai-feel-alive)
 
 ### [07 - Prompt Chaining](./07-prompt-chaining)
+
 Build multi-step AI workflows and "agent" systems.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)

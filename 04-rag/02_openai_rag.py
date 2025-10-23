@@ -143,7 +143,7 @@ print(answer)
 print(f"{'='*80}\n")
 
 # Try another question
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 question2 = "What are the main types of machine learning?"
 print(f"Question: {question2}")
 
@@ -169,8 +169,8 @@ WHAT YOU JUST LEARNED:
    - The search logic doesn't care about the LLM
 
 3. When to use embeddings vs keyword search:
-   - Keyword search: < 50,000 documents, exact matches matter
-   - Embeddings: > 50,000 documents, semantic meaning matters
+   - Keyword search: < 10,000 documents, exact matches matter
+   - Embeddings: > 10,000 documents, semantic meaning matters
    - Many production systems start with keywords, add embeddings later
 
 4. You can build this yourself

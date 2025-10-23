@@ -161,7 +161,7 @@ print(answer)
 print(f"{'='*80}\n")
 
 # Try another question
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 question2 = "What are the main types of machine learning?"
 print(f"Question: {question2}")
 

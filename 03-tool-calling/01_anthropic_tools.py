@@ -143,6 +143,9 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
                 {"role": "assistant", "content": response.content}
             )
 
+            # Uncomment this if you want to print the full response.content
+            # print(conversation_history)
+
             # Execute each tool Claude requested
             tool_results = []
             for block in response.content:
@@ -175,6 +178,9 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
             conversation_history.append(
                 {"role": "assistant", "content": response.content}
             )
+
+            # Uncomment this if you want to print the full response.content
+            # print(conversation_history)
 
             # Extract the text response
             final_answer = response.content[0].text

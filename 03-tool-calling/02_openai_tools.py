@@ -139,6 +139,9 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
             # Add GPT's message to history (includes tool call requests)
             conversation_history.append(response.choices[0].message)
 
+            # Uncomment this if you want to print the full response message
+            # print(conversation_history)
+
             # Execute all requested tools
             tool_calls = response.choices[0].message.tool_calls
 
@@ -173,6 +176,10 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
             print(f"✨ ITERATION {iteration}: GPT has final answer\n")
 
             conversation_history.append(response.choices[0].message)
+
+            # Uncomment this if you want to print the full response.content
+            # print(conversation_history)
+
             final_answer = response.choices[0].message.content
 
             print(f"{'='*80}")

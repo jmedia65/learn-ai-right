@@ -4,7 +4,7 @@
 
 Streaming makes AI responses appear word-by-word in real-time instead of waiting for the complete answer.
 
-**The psychology**: Users perceive streamed responses as 30-40% faster even when total time is similar, because they can start reading within milliseconds rather than waiting seconds for completion.
+**The psychology**: Users perceive streamed responses faster even when total time is similar, because they can start reading within milliseconds rather than waiting seconds for completion.
 
 **The reality**: Streaming is just iterating through response chunks as they arrive from the API.
 

@@ -4,9 +4,9 @@
 
 ## Why This Exists
 
-When I started learning AI development, I found endless tutorials on frameworks like LangChain and LlamaIndex. But when something broke, I had no idea what was actually happening under the hood. I couldn't debug issues, optimize performance, or make informed architectural decisions.
+When I started learning AI development, I found endless tutorials on various frameworks and libraries. But when something broke, I had no idea what was actually happening under the hood. I couldn't debug issues, optimize performance, or make informed architectural decisions.
 
-This course fills that gap. It teaches you what AI systems actually do, stripped of abstractions and marketing jargon. You'll learn the foundational patterns that all AI applications use—whether they admit it or not.
+This course fills that gap. It teaches you what AI systems actually do, stripped of abstractions and marketing jargon. You'll learn the foundational patterns that all AI applications use - whether they admit it or not.
 
 ## The Philosophy
 
@@ -156,7 +156,7 @@ Build multi-step AI workflows and "agent" systems.
 
 ## About
 
-I'm Max Braglia, and I write about AI engineering at [maxbraglia.substack.com](https://maxbraglia.substack.com). I built this course because I wish it existed when I started learning AI development.
+I'm [Max Braglia](https://maxbraglia.com/), and I write about AI engineering at [maxbraglia.substack.com](https://maxbraglia.substack.com). I built this course because I wish it existed when I started learning AI development.
 
 If you find this valuable, consider [subscribing to my newsletter](https://maxbraglia.substack.com) where I share practical AI development insights.
 

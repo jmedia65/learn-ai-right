@@ -28,7 +28,7 @@ Both examples use the same simple keyword search and document set.
 
 RAG in three steps:
 
-1. **Retrieve**: Search your documents for relevant content (keyword matching works for most cases)
+1. **Retrieve**: Search your documents for relevant content (keyword matching works for many cases)
 2. **Augment**: Add those documents to your prompt as context
 3. **Generate**: Ask the AI to answer based only on the provided documents
 

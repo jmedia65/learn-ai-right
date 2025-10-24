@@ -50,5 +50,3 @@ You've completed all 7 foundational concepts! You now understand:
 7. Prompt chaining
 
 These patterns combine to build any AI application. Frameworks may add conveniences, but you now understand what's actually happening under the hood.
-
-Build something!

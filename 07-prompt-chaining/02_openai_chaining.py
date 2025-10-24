@@ -275,14 +275,13 @@ WHAT YOU JUST LEARNED:
    - Chain with streaming (stream final output)
    - Chain with memory (conversational workflows)
 
-4. When to use frameworks:
-   Frameworks like LangChain add:
-   - Built-in error handling
-   - Retry logic
+4. When frameworks help:
+   - Error handling and retries
    - Parallel execution
-   - Logging and monitoring
+   - State management across long workflows
+   - Logging and observability
 
-   But you DON'T need them to understand or build AI systems.
+   But you don't NEED them to build this.
    Now that you know the fundamentals, you can choose wisely.
 
 CONGRATULATIONS! You've completed all 7 foundational concepts.

@@ -1,6 +1,6 @@
-# Learn AI Right: Foundational AI Without the Bloat
+# Learn AI Right: AI Development Without Frameworks
 
-**Master AI fundamentals without frameworks. Just Python, APIs, and clarity.**
+**Learn AI fundamentals without frameworks. Just Python, APIs, and clarity.**
 
 ## Why This Exists
 

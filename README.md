@@ -2,6 +2,8 @@
 
 **Learn AI fundamentals without frameworks. Just Python, APIs, and clarity.**
 
+![Learn AI Right Hero Image](assets/learn_ai_right_hero.jpg)
+
 ## Why This Exists
 
 When I started learning AI development, I found endless tutorials on various frameworks and libraries. But when something broke, I had no idea what was actually happening under the hood. I couldn't debug issues, optimize performance, or make informed architectural decisions.

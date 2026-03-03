@@ -2,12 +2,12 @@
 
 ## Core Concept
 
-Every AI application follows the same foundational pattern: **initialize a client → send messages → extract the response**. That's it. Whether you're building a chatbot, a code generator, or a complex AI system, this three-step pattern is always there.
+Every AI application follows the same foundational pattern: **initialize a client → send input → extract the response**. That's it. Whether you're building a chatbot, a code generator, or a complex AI system, this three-step pattern is always there.
 
 ## What You'll Learn
 
-- How to make your first API call to Claude (Anthropic) and GPT (OpenAI)
-- The anatomy of a request: model, max_tokens, and messages
+- How to make your first API call to Claude (Anthropic) and GPT (OpenAI Responses API)
+- The anatomy of a request: model, tokens, and input/messages
 - How to extract the AI's response from the API response object
 - What metadata the API returns (token usage, stop reasons, model info)
 
@@ -22,7 +22,7 @@ Both examples do the same thing using different APIs. Compare them to see the si
 
 You don't need a framework to talk to an AI. You need:
 1. An API client (Anthropic or OpenAI)
-2. A messages array with user input
+2. Input (a string or a messages list)
 3. Code to extract the response
 
 Everything else in AI development builds on this pattern.

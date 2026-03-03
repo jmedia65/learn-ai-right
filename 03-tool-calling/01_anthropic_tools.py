@@ -127,7 +127,7 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
 
         # Call Claude with tools available
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=1024,
             tools=tools,  # <-- Provide the tool schemas
             messages=conversation_history,

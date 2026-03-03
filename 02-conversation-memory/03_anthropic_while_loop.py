@@ -39,7 +39,7 @@ while True:
     # Step 2: Send full history to Claude
     # Claude sees the entire conversation, so it has "memory"
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         messages=conversation_history,  # <-- The entire history every time
     )

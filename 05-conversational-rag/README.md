@@ -13,7 +13,7 @@ This lets users ask follow-up questions like "Who created it?" and the AI unders
 - How to combine document retrieval with conversation memory
 - When to refresh documents (every turn) vs. when to preserve context (history)
 - How the AI uses both fresh documents AND conversation history to understand context
-- The difference between Anthropic's system parameter and OpenAI's system message approach
+- The difference between Anthropic's `system` parameter and OpenAI Responses `instructions` approach
 
 ## Files in This Module
 

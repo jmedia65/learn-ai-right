@@ -1,10 +1,8 @@
 """
-CONVERSATION MEMORY - OPENAI GPT
+CONVERSATION MEMORY - OPENAI GPT (Interactive, Responses API)
 
 This demonstrates the same conversation memory pattern as Anthropic.
-The only difference is the API syntax - the concept is identical.
-
-Memory = A Python list. That's it.
+The concept is identical: memory is still a Python list.
 """
 
 import os
@@ -12,6 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # This is your "memory" - just a Python list
@@ -37,21 +36,19 @@ while True:
     conversation_history.append({"role": "user", "content": user_input})
 
     # Step 2: Send full history to GPT
-    # GPT sees the entire conversation, so it has "memory"
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        max_tokens=1024,
-        messages=conversation_history,  # <-- The entire history every time
+    response = client.responses.create(
+        model=MODEL,
+        max_output_tokens=1024,
+        input=conversation_history,
     )
 
     # Step 3: Extract GPT's response
-    assistant_message = response.choices[0].message.content
+    assistant_message = response.output_text
 
     # Step 4: Display the response
     print(f"\nGPT: {assistant_message}")
 
     # Step 5: Add GPT's response to history
-    # This ensures GPT sees its own previous responses in future turns
     conversation_history.append({"role": "assistant", "content": assistant_message})
 
     # The loop repeats! Back to Step 1 with an updated history
@@ -60,9 +57,9 @@ while True:
 WHAT YOU JUST LEARNED:
 
 1. The pattern is identical to Anthropic
-   - Same messages array structure
+   - Same role/content history list
    - Same append-send-extract-append loop
-   - Just different method names
+   - Different SDK method: client.responses.create()
 
 2. The five-step loop that powers every chatbot:
    Step 1: Append user message to history
@@ -71,18 +68,15 @@ WHAT YOU JUST LEARNED:
    Step 4: Display it to the user
    Step 5: Append assistant message to history
 
-   Then repeat forever (or until user types "quit")
-
-3. This works for ANY conversation-based AI application
+3. This works for ANY conversation-based AI app
    - Customer support bots
    - Coding assistants
    - Educational tutors
-   - Whatever you want to build
+   - Anything conversational
 
-4. Key insight: The AI sees EVERYTHING every time
-   - The model doesn't maintain state
-   - You maintain state (the history list)
-   - You give the model its "memory" by sending the full context
+4. OpenAI also offers previous_response_id
+   - Useful for stateful chains
+   - But the list approach keeps the fundamentals explicit
 
 NEXT STEP: Learn how to make AI take actions using tool calling
 """

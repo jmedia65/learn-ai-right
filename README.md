@@ -41,17 +41,26 @@ That's it. No magic. Just API calls and basic programming.
 
 ## What You'll Learn
 
-This course covers 7 foundational concepts, each with working code examples for both Anthropic's Claude and OpenAI's GPT:
+This course covers 8 foundational concepts, each with working code examples for both Anthropic's Claude and OpenAI's GPT:
 
 1. **Your First AI Call** - The basic pattern every AI application uses
 2. **Conversation Memory** - How chatbots remember previous messages
-3. **Tool Calling** - Making AI take actions through functions
-4. **RAG** - Making AI answer questions from your documents
-5. **Conversational RAG** - Adding follow-up questions to document Q&A
-6. **Streaming** - Displaying AI responses word-by-word in real-time
-7. **Prompt Chaining** - Building multi-step AI workflows
+3. **Structured Outputs** - Turning model output into typed, validated data
+4. **Tool Calling** - Making AI take actions through functions
+5. **RAG** - Making AI answer questions from your documents
+6. **Conversational RAG** - Adding follow-up questions to document Q&A
+7. **Streaming** - Displaying AI responses word-by-word in real-time
+8. **Prompt Chaining** - Building multi-step AI workflows
 
 Each concept builds on the previous one. By the end, you'll understand how production AI systems work.
+
+## API Versions in This Repo
+
+- OpenAI examples use the **Responses API** (`client.responses.create(...)`), which is the recommended primary API for new projects.
+- Anthropic examples use the current `messages` API patterns.
+- Models are configurable via env vars:
+  - `OPENAI_MODEL` (default in examples: `gpt-4.1`)
+  - `ANTHROPIC_MODEL` (default in examples: `claude-sonnet-4-6`)
 
 ## Prerequisites
 
@@ -89,6 +98,9 @@ Add your API keys to `.env`:
 ```
 ANTHROPIC_API_KEY=your_anthropic_key_here
 OPENAI_API_KEY=your_openai_key_here
+# Optional:
+# ANTHROPIC_MODEL=claude-sonnet-4-6
+# OPENAI_MODEL=gpt-4.1
 ```
 
 Get API keys:
@@ -112,7 +124,7 @@ Each module contains:
 - Python examples for OpenAI GPT
 - Heavily commented code showing exactly what's happening
 
-Work through them in order:
+Work through them in this recommended order:
 
 ### [01 - Your First AI Call](./01-your-first-ai-call)
 
@@ -125,6 +137,10 @@ Learn the foundational pattern: initialize → call → extract response.
 Understand how chatbots remember context (spoiler: it's just a list).
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)
+
+### [02b - Structured Outputs](./02b-structured-outputs)
+
+Bridge module: learn to get typed, validated outputs before tool calling.
 
 ### [03 - Tool Calling](./03-tool-calling)
 

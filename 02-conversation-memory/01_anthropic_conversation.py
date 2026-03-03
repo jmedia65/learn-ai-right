@@ -35,7 +35,7 @@ print(f"User: {user_message_1}")
 # Step 2: Send the ENTIRE conversation history
 # Right now it's just one message, but we always send the full list
 response_1 = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=conversation_history,  # <-- The whole history goes here
 )
@@ -65,7 +65,7 @@ print(f"User: {user_message_2}")
 # Send the ENTIRE conversation history again
 # Claude sees all 3 messages, so it knows the user's name is Alex
 response_2 = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=conversation_history,  # <-- Still just sending the list
 )
@@ -91,7 +91,7 @@ print(f"User: {user_message_3}")
 
 # Send the ENTIRE history (now 5 messages)
 response_3 = client.messages.create(
-    model="claude-sonnet-4-20250514", max_tokens=1024, messages=conversation_history
+    model="claude-sonnet-4-6", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_3 = response_3.content[0].text
@@ -113,7 +113,7 @@ conversation_history.append({"role": "user", "content": user_message_4})
 print(f"User: {user_message_4}")
 
 response_4 = client.messages.create(
-    model="claude-sonnet-4-20250514", max_tokens=1024, messages=conversation_history
+    model="claude-sonnet-4-6", max_tokens=1024, messages=conversation_history
 )
 
 assistant_message_4 = response_4.content[0].text

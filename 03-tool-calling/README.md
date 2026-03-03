@@ -13,7 +13,7 @@ Tool calling = AI orchestrates, you execute.
 - How to define tool schemas that describe your functions to the AI
 - The request-execute-return loop that powers tool calling
 - How to handle multiple sequential tool calls
-- The differences between Anthropic and OpenAI tool formats
+- The differences between Anthropic and OpenAI Responses tool formats (`function_call` / `function_call_output`)
 
 ## Files in This Module
 

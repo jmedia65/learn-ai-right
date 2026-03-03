@@ -28,7 +28,7 @@ print("Claude (non-streaming): ", end="", flush=True)
 
 # Regular API call - we've been using this pattern
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 )
@@ -51,7 +51,7 @@ print("Claude (streaming): ", end="", flush=True)
 # The only change: Use .stream() instead of .create()
 # Wrap in a context manager (with statement) for proper cleanup
 with client.messages.stream(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 ) as stream:
@@ -86,7 +86,7 @@ print("Claude: ", end="", flush=True)
 full_response = ""  # We'll build the complete response here
 
 with client.messages.stream(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=conversation_history,
 ) as stream:
@@ -108,7 +108,7 @@ print("Claude: ", end="", flush=True)
 full_response_2 = ""
 
 with client.messages.stream(
-    model="claude-sonnet-4-20250514",
+    model="claude-sonnet-4-6",
     max_tokens=1024,
     messages=conversation_history,
 ) as stream:

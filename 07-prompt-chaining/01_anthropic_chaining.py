@@ -38,7 +38,7 @@ def research_write_edit(topic: str) -> str:
     print("-" * 80)
 
     research_response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         messages=[
             {
@@ -66,7 +66,7 @@ Be concise and factual.""",
     print("-" * 80)
 
     draft_response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         messages=[
             {
@@ -91,7 +91,7 @@ Make it engaging and accessible to beginners.""",
 
     final = ""
     with client.messages.stream(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1024,
         messages=[
             {
@@ -140,7 +140,7 @@ def handle_support_request(user_message: str) -> str:
     print("-" * 80)
 
     classification_response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=100,
         messages=[
             {
@@ -169,7 +169,7 @@ Output ONLY the category name, nothing else.""",
     if category == "bug_report":
         # Handle bug reports
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=500,
             messages=[
                 {
@@ -188,7 +188,7 @@ Output ONLY the category name, nothing else.""",
     elif category == "feature_request":
         # Handle feature requests
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=500,
             messages=[
                 {
@@ -207,7 +207,7 @@ Output ONLY the category name, nothing else.""",
     else:
         # Default handler for other categories
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=500,
             messages=[
                 {
@@ -286,14 +286,15 @@ WHAT YOU JUST LEARNED:
 
    But you don't NEED them to build this.
 
-CONGRATULATIONS! You've completed all 7 foundational concepts:
+CONGRATULATIONS! You've completed all 8 foundational concepts:
 1. Basic API calls
 2. Conversation memory
-3. Tool calling
-4. RAG
-5. Conversational RAG
-6. Streaming
-7. Prompt chaining
+3. Structured outputs
+4. Tool calling
+5. RAG
+6. Conversational RAG
+7. Streaming
+8. Prompt chaining
 
 You now understand how AI applications actually work. Go build something!
 """

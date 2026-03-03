@@ -22,7 +22,7 @@ client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 # Step 2: Call the API
 # Send a messages array to Claude
 response = client.messages.create(
-    model="claude-sonnet-4-20250514",  # Which AI model to use
+    model="claude-sonnet-4-6",  # Which AI model to use
     max_tokens=1024,  # Maximum length of response (~750-1000 words)
     messages=[
         {

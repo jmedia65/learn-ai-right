@@ -1,8 +1,8 @@
 """
-STREAMING RESPONSES - OPENAI GPT
+STREAMING RESPONSES - OPENAI GPT (Responses API)
 
-Same streaming concept as Anthropic, with OpenAI-specific syntax.
-The core idea is identical: Display chunks as they arrive.
+Same streaming concept as Anthropic, with OpenAI-specific event syntax.
+Core idea: display text chunks as they arrive.
 """
 
 import os
@@ -10,6 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -23,15 +24,13 @@ print("=" * 80)
 print("\nAsking GPT a question...\n")
 print("GPT (non-streaming): ", end="", flush=True)
 
-# Regular API call
-response = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
+response = client.responses.create(
+    model=MODEL,
+    max_output_tokens=1024,
+    input="Explain Python in two sentences.",
 )
 
-# All text arrives at once
-print(response.choices[0].message.content)
+print(response.output_text)
 print("\n^ Notice: Full response appeared at once (after waiting)")
 
 # =============================================================================
@@ -45,21 +44,17 @@ print("=" * 80)
 print("\nAsking GPT the same question with streaming...\n")
 print("GPT (streaming): ", end="", flush=True)
 
-# The only change: Add stream=True
-# OpenAI returns an iterator directly (no 'with' statement needed)
-stream = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
-    stream=True,  # This enables streaming!
-    messages=[{"role": "user", "content": "Explain Python in two sentences."}],
+# The key change: stream=True and iterate events
+stream = client.responses.create(
+    model=MODEL,
+    max_output_tokens=1024,
+    input="Explain Python in two sentences.",
+    stream=True,
 )
 
-# Iterate through chunks
-for chunk in stream:
-    # IMPORTANT: Check if chunk has content
-    # Some chunks don't have content (e.g., metadata chunks)
-    if chunk.choices[0].delta.content is not None:
-        print(chunk.choices[0].delta.content, end="", flush=True)
+for event in stream:
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
 
 print("\n\n^ Notice: Text appeared gradually as GPT generated it!")
 
@@ -82,29 +77,24 @@ conversation_history.append({"role": "user", "content": user_message})
 print(f"User: {user_message}\n")
 print("GPT: ", end="", flush=True)
 
-# Stream the response AND accumulate it for history
-full_response = ""  # We'll build the complete response here
+full_response = ""
 
-stream = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
+stream = client.responses.create(
+    model=MODEL,
+    max_output_tokens=1024,
+    input=conversation_history,
     stream=True,
-    messages=conversation_history,
 )
 
-for chunk in stream:
-    # Check if chunk has content
-    if chunk.choices[0].delta.content is not None:
-        content = chunk.choices[0].delta.content
-        print(content, end="", flush=True)  # Display in real-time
-        full_response += content  # Accumulate for conversation history
+for event in stream:
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
+        full_response += event.delta
 
-print()  # Newline after streaming completes
+print()
 
-# Add GPT's complete response to history
 conversation_history.append({"role": "assistant", "content": full_response})
 
-# Now we can ask a follow-up question
 print("\nUser: Who created it?\n")
 conversation_history.append({"role": "user", "content": "Who created it?"})
 
@@ -112,18 +102,17 @@ print("GPT: ", end="", flush=True)
 
 full_response_2 = ""
 
-stream = client.chat.completions.create(
-    model="gpt-4o",
-    max_tokens=1024,
+stream = client.responses.create(
+    model=MODEL,
+    max_output_tokens=1024,
+    input=conversation_history,
     stream=True,
-    messages=conversation_history,
 )
 
-for chunk in stream:
-    if chunk.choices[0].delta.content is not None:
-        content = chunk.choices[0].delta.content
-        print(content, end="", flush=True)
-        full_response_2 += content
+for event in stream:
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
+        full_response_2 += event.delta
 
 print("\n")
 
@@ -136,27 +125,18 @@ print("=" * 80)
 """
 WHAT YOU JUST LEARNED:
 
-1. OpenAI vs Anthropic streaming differences:
-   - Anthropic: client.messages.stream() with 'with' statement
-   - OpenAI: client.chat.completions.create(stream=True) returns iterator
-   - Anthropic: stream.text_stream yields text directly
-   - OpenAI: Must check if chunk.choices[0].delta.content is not None
+1. Responses streaming uses events
+   - stream=True enables event streaming
+   - response.output_text.delta events carry incremental text
 
-2. The pattern is the same:
-   - Enable streaming
-   - Iterate through chunks
+2. The pattern is still the same idea
+   - Iterate chunks/events
    - Print immediately with flush=True
-   - Accumulate for conversation history
+   - Optionally accumulate for memory
 
-3. Why check for None?
-   - OpenAI sends metadata chunks without content
-   - You must check before accessing .content
-   - Anthropic's .text_stream filters these automatically
-
-4. Real-world usage:
-   - Web apps: Stream to frontend via WebSockets or SSE
-   - CLI tools: Stream to terminal (this example)
-   - Batch processing: Don't use streaming
+3. Streaming + memory works cleanly
+   - Show text in real-time for UX
+   - Save full text to conversation_history after stream completes
 
 NEXT STEP: Learn prompt chaining to build multi-step workflows
 """

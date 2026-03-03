@@ -1,10 +1,10 @@
 """
-YOUR FIRST AI CALL - OPENAI GPT
+YOUR FIRST AI CALL - OPENAI GPT (RESPONSES API)
 
-This is the same foundational pattern as Anthropic, with slightly different syntax.
-Three steps: initialize → call → extract.
+This is the same foundational pattern as Anthropic, using OpenAI's
+recommended primary API for new projects: Responses.
 
-Compare this with 01_anthropic_basic.py to see the similarities and differences.
+Three steps: initialize -> call -> extract.
 """
 
 import os
@@ -15,26 +15,24 @@ from dotenv import load_dotenv
 # This is where your API keys are stored
 load_dotenv()
 
+# Optional model override for experiments
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+
 # Step 1: Initialize the client
 # This sets up authentication with OpenAI's API
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Step 2: Call the API
-# Send a messages array to GPT
-response = client.chat.completions.create(
-    model="gpt-4o",  # Which AI model to use
-    max_tokens=1024,  # Maximum length of response (~750-1000 words)
-    messages=[
-        {
-            "role": "user",  # Who is speaking (user or assistant)
-            "content": "Explain what an API is in one sentence.",  # What you're asking
-        }
-    ],
+# Step 2: Call the API (Responses API)
+# For simple text tasks, input can be a plain string
+response = client.responses.create(
+    model=MODEL,
+    max_output_tokens=1024,  # Maximum length of response
+    input="Explain what an API is in one sentence.",
 )
 
 # Step 3: Extract the response
-# For OpenAI, the text is in response.choices[0].message.content
-answer = response.choices[0].message.content
+# Responses API exposes a convenience field for final text
+answer = response.output_text
 
 # Display the AI's response
 print("=" * 80)
@@ -46,31 +44,30 @@ print("=" * 80)
 # Display metadata about the API call
 # This information helps you track costs and debug issues
 print("\nRESPONSE METADATA:")
-print(f"Model used: {response.model}")  # Confirms which model answered
-print(
-    f"Finish reason: {response.choices[0].finish_reason}"
-)  # Why the response ended (usually "stop")
-print(f"Input tokens: {response.usage.prompt_tokens}")  # Tokens in your prompt
-print(f"Output tokens: {response.usage.completion_tokens}")  # Tokens in GPT's response
-print(f"Total tokens: {response.usage.total_tokens}")  # Sum of input + output
+print(f"Response ID: {response.id}")
+print(f"Model used: {response.model}")
+print(f"Status: {response.status}")
+if response.usage is not None:
+    print(f"Input tokens: {response.usage.input_tokens}")
+    print(f"Output tokens: {response.usage.output_tokens}")
+    print(f"Total tokens: {response.usage.total_tokens}")
 
 """
 WHAT YOU JUST LEARNED:
 
-1. OpenAI uses almost the same pattern as Anthropic
-   - Same messages array structure
-   - Same role/content format
-   - Just different method names and response paths
+1. Responses is OpenAI's primary API for new projects
+   - Method: client.responses.create()
+   - For simple prompts, pass input as a string
 
-2. Key differences from Anthropic:
-   - Method: client.chat.completions.create() vs client.messages.create()
-   - Response path: response.choices[0].message.content vs response.content[0].text
-   - Token names: prompt_tokens/completion_tokens vs input_tokens/output_tokens
-
-3. The CONCEPT is identical
-   - Send messages array
+2. The concept is still identical
+   - Send input
    - Get response object
-   - Extract the text
+   - Extract text with response.output_text
 
-NEXT STEP: Learn how to add conversation memory (it's just a list!)
+3. The same core pattern still applies
+   - Initialize client
+   - Call model
+   - Extract response
+
+NEXT STEP: Learn how to add conversation memory (it's still just a list!)
 """

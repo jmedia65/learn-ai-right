@@ -39,14 +39,15 @@ All of these are just API calls with Python logic between them.
 
 ## What's Next?
 
-You've completed all 7 foundational concepts! You now understand:
+You've completed all 8 foundational concepts! You now understand:
 
 1. Basic API calls
 2. Conversation memory
-3. Tool calling
-4. RAG
-5. Conversational RAG
-6. Streaming
-7. Prompt chaining
+3. Structured outputs
+4. Tool calling
+5. RAG
+6. Conversational RAG
+7. Streaming
+8. Prompt chaining
 
 These patterns combine to build any AI application. Frameworks may add conveniences, but you now understand what's actually happening under the hood.

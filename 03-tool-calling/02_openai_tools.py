@@ -1,8 +1,8 @@
 """
-TOOL CALLING - OPENAI GPT
+TOOL CALLING - OPENAI GPT (Responses API)
 
-This is the same tool calling pattern as Anthropic, with OpenAI-specific syntax.
-The concept is identical: AI decides → You execute → Return results → AI responds
+Same core concept as Anthropic:
+AI decides -> You execute -> Return results -> AI responds.
 """
 
 import os
@@ -11,12 +11,12 @@ from dotenv import load_dotenv
 import json
 
 load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
 # STEP 1: YOUR PYTHON FUNCTIONS
 # =============================================================================
-# Same functions as Anthropic example
 
 
 def get_weather(location: str) -> dict:
@@ -41,146 +41,128 @@ def get_user_info(user_id: str) -> dict:
 
 
 # =============================================================================
-# STEP 2: TOOL SCHEMAS (OpenAI Format)
+# STEP 2: TOOL SCHEMAS (Responses API format)
 # =============================================================================
-# OpenAI uses a slightly different format than Anthropic
 
 tools = [
     {
-        "type": "function",  # OpenAI requires this wrapper
-        "function": {
-            "name": "get_weather",
-            "description": "Get the current weather for a specific location. Returns temperature, condition, and humidity.",
-            "parameters": {  # OpenAI uses "parameters" instead of "input_schema"
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "The city name, e.g., 'Miami' or 'New York'",
-                    }
-                },
-                "required": ["location"],
+        "type": "function",
+        "name": "get_weather",
+        "description": "Get the current weather for a specific location. Returns temperature, condition, and humidity.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": "The city name, e.g., 'Miami' or 'New York'",
+                }
             },
+            "required": ["location"],
+            "additionalProperties": False,
         },
     },
     {
         "type": "function",
-        "function": {
-            "name": "get_user_info",
-            "description": "Get information about a user by their user ID.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "string",
-                        "description": "The user's ID, e.g., 'user_123'",
-                    }
-                },
-                "required": ["user_id"],
+        "name": "get_user_info",
+        "description": "Get information about a user by their user ID.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string",
+                    "description": "The user's ID, e.g., 'user_123'",
+                }
             },
+            "required": ["user_id"],
+            "additionalProperties": False,
         },
     },
 ]
 
+
 # =============================================================================
 # STEP 3: TOOL ROUTER
 # =============================================================================
-# Same as Anthropic - executes the actual Python code
 
 
 def execute_tool(tool_name: str, tool_input: dict):
     """Route tool calls to the correct Python function."""
     if tool_name == "get_weather":
         return get_weather(tool_input["location"])
-    elif tool_name == "get_user_info":
+    if tool_name == "get_user_info":
         return get_user_info(tool_input["user_id"])
-    else:
-        return {"error": f"Unknown tool: {tool_name}"}
+    return {"error": f"Unknown tool: {tool_name}"}
 
 
 # =============================================================================
-# STEP 4: CHAT WITH TOOLS LOOP (OpenAI Version)
+# STEP 4: CHAT WITH TOOLS LOOP (Responses API)
 # =============================================================================
 
 
-def chat_with_tools(user_message: str, tools: list, conversation_history: list):
+def chat_with_tools(user_message: str, tools: list):
     """
-    Handle a conversation with tool use - OpenAI version.
+    Handle tool use with Responses API.
 
-    Same pattern as Anthropic, different API details.
+    Loop:
+    1. Send user message + tools
+    2. If model emits function_call items, execute them
+    3. Send function_call_output items back
+    4. Repeat until final text response
     """
     print(f"\n{'='*80}")
     print(f"USER: {user_message}")
     print(f"{'='*80}\n")
 
-    # Add user message to history
-    conversation_history.append({"role": "user", "content": user_message})
-
     iteration = 0
+    response = client.responses.create(
+        model=MODEL,
+        tools=tools,
+        input=user_message,
+    )
 
-    # Loop until GPT stops using tools
     while True:
         iteration += 1
 
-        # Call GPT with tools available
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            max_tokens=1024,
-            tools=tools,  # <-- Provide the tool schemas
-            messages=conversation_history,
-        )
+        # Responses can include multiple output item types.
+        # We care about function_call items during the tool loop.
+        function_calls = [item for item in response.output if item.type == "function_call"]
 
-        finish_reason = response.choices[0].finish_reason
-
-        # Check if GPT wants to use tools
-        if finish_reason == "tool_calls":  # OpenAI uses "tool_calls" not "tool_use"
+        if function_calls:
             print(f"🔄 ITERATION {iteration}: GPT wants to use tools")
 
-            # Add GPT's message to history (includes tool call requests)
-            conversation_history.append(response.choices[0].message)
+            tool_outputs = []
+            for call in function_calls:
+                function_name = call.name
 
-            # Uncomment this if you want to print the full response message
-            # print(conversation_history)
-
-            # Execute all requested tools
-            tool_calls = response.choices[0].message.tool_calls
-
-            for tool_call in tool_calls:
-                function_name = tool_call.function.name
-
-                # IMPORTANT: OpenAI returns arguments as a JSON STRING
-                # You must parse it before using
-                function_args = json.loads(tool_call.function.arguments)
+                # Arguments arrive as a JSON string
+                function_args = json.loads(call.arguments)
 
                 print(f"   📞 Calling: {function_name}({json.dumps(function_args)})")
 
-                # YOU execute the actual Python function
                 result = execute_tool(function_name, function_args)
 
                 print(f"   ✅ Result: {json.dumps(result)}\n")
 
-                # Add tool result to history
-                # OpenAI uses a special "tool" role for results
-                conversation_history.append(
+                tool_outputs.append(
                     {
-                        "role": "tool",  # Special role for tool results
-                        "tool_call_id": tool_call.id,  # Links result to request
-                        "content": json.dumps(result),
+                        "type": "function_call_output",
+                        "call_id": call.call_id,
+                        "output": json.dumps(result),
                     }
                 )
 
-            # Loop continues - GPT will see the tool results
+            # Continue the same reasoning thread using previous_response_id
+            response = client.responses.create(
+                model=MODEL,
+                tools=tools,
+                input=tool_outputs,
+                previous_response_id=response.id,
+            )
 
-        else:  # finish_reason is "stop" or "length"
-            # GPT has a final answer
+        else:
             print(f"✨ ITERATION {iteration}: GPT has final answer\n")
 
-            conversation_history.append(response.choices[0].message)
-
-            # Uncomment this if you want to print the full response.content
-            # print(conversation_history)
-
-            final_answer = response.choices[0].message.content
+            final_answer = response.output_text
 
             print(f"{'='*80}")
             print("GPT'S FINAL ANSWER:")
@@ -195,48 +177,28 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
 # USAGE EXAMPLE
 # =============================================================================
 
-conversation_history = []
-
-# Ask GPT to use multiple tools in sequence
 chat_with_tools(
     "Get info for user_123 and tell me about their city's weather",
     tools,
-    conversation_history,
 )
 
 """
 WHAT YOU JUST LEARNED:
 
-1. OpenAI vs Anthropic differences for tool calling:
+1. Tool calling with Responses API
+   - Model emits function_call items
+   - You execute Python functions
+   - You send back function_call_output items
 
-   Schema format:
-   - Anthropic: "input_schema"
-   - OpenAI: "parameters" wrapped in "function" with "type": "function"
+2. previous_response_id keeps the chain connected
+   - Each follow-up call continues the same reasoning thread
+   - You don't need to resend the original user message every iteration
 
-   Stop reasons:
-   - Anthropic: stop_reason == "tool_use"
-   - OpenAI: finish_reason == "tool_calls"
-
-   Tool results:
-   - Anthropic: Add as user message with type "tool_result"
-   - OpenAI: Add with special role "tool"
-
-   Arguments format:
-   - Anthropic: Comes as a dict (block.input)
-   - OpenAI: Comes as JSON string (must parse with json.loads())
-
-2. The PATTERN is identical:
-   - Define schemas
+3. The pattern is still identical to Anthropic
+   - Define tools
    - AI decides what to call
-   - You execute the actual code
-   - Return results
-   - Loop until AI is done
-
-3. This is how real AI systems work:
-   - Customer support bots calling ticket systems
-   - Code assistants running tests
-   - Research agents searching databases
-   - All the same pattern
+   - You execute and return results
+   - Repeat until final answer
 
 NEXT STEP: Learn RAG (making AI answer from your documents)
 """

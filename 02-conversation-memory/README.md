@@ -11,6 +11,7 @@ LLMs like Claude and GPT are stateless—they have no memory between API calls. 
 - How chatbots "remember" previous messages (spoiler: they don't, you do)
 - The five-step pattern for multi-turn conversations
 - How to build both scripted and interactive chat experiences
+- How Responses API memory can be done with explicit history lists (and when `previous_response_id` helps)
 - Why conversations get more expensive as they get longer
 
 ## Files in This Module
@@ -50,6 +51,6 @@ That's it. No magic. Just a Python list and sequential API calls.
 
 ## Next Step
 
-Now that AI can remember context, let's make it take actions:
+Before tool calling, learn how to make model outputs reliable and structured:
 
-👉 [03 - Tool Calling](../03-tool-calling)
+👉 [02b - Structured Outputs](../02b-structured-outputs)

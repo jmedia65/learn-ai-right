@@ -26,8 +26,8 @@ Both examples compare non-streaming vs. streaming side-by-side.
 
 Streaming in three steps:
 
-1. Use `.stream()` instead of `.create()` (wrapped in context manager)
-2. Iterate through chunks as they arrive
+1. Enable streaming (`client.messages.stream(...)` for Anthropic, `stream=True` for OpenAI Responses)
+2. Iterate through chunks/events as they arrive
 3. Print immediately with `flush=True` to bypass Python's output buffering
 
 The total processing time is similar, but the user experience is dramatically better.

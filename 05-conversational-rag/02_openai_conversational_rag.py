@@ -1,8 +1,8 @@
 """
-CONVERSATIONAL RAG - OPENAI GPT
+CONVERSATIONAL RAG - OPENAI GPT (Responses API)
 
 Same pattern as Anthropic: Fresh retrieval + conversation memory.
-The only difference is how system messages are handled.
+OpenAI difference: use instructions + input with Responses API.
 """
 
 import os
@@ -10,6 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -71,7 +72,7 @@ def simple_keyword_search(query: str, documents: list, max_results: int = 3) -> 
 
 
 # =============================================================================
-# CONVERSATIONAL RAG FUNCTION (OpenAI version)
+# CONVERSATIONAL RAG FUNCTION (OpenAI Responses API)
 # =============================================================================
 
 
@@ -79,8 +80,11 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     """
     Conversational RAG: Fresh retrieval + conversation memory.
 
-    OpenAI difference: System messages go IN the messages array,
-    not as a separate parameter.
+    On each turn:
+    1. Retrieve docs for THIS question
+    2. Build instructions from retrieved docs
+    3. Send full conversation history + new question
+    4. Append user + assistant messages to history
     """
 
     print(f"\n{'='*80}")
@@ -108,41 +112,32 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     for doc in relevant_docs:
         context += f"{doc['title']}:\n{doc['content'].strip()}\n\n"
 
-    # STEP 3: Build system message with CURRENT documents
-    system_message_content = f"""You are a helpful assistant that answers questions based on provided documents.
+    instructions = f"""You are a helpful assistant that answers questions based on provided documents.
 
 Available documents:
 {context}
 
 Instructions:
 - Answer based on the documents provided
-- Use conversation history for context (e.g., understanding pronouns like "it")
+- Use conversation history for context (e.g., understanding pronouns like 'it')
 - If asked a follow-up question, remember previous exchanges
 - Cite which document you're using when possible"""
 
-    # STEP 4: Build full messages array
-    # OpenAI requires system message to be IN the messages array
-    # We rebuild it each turn with fresh documents
-    messages = (
-        [{"role": "system", "content": system_message_content}]
-        + conversation_history
-        + [{"role": "user", "content": question}]
-    )
+    # STEP 3: Build input with full history + new question
+    # History remains explicit so students can see memory mechanics.
+    input_messages = conversation_history + [{"role": "user", "content": question}]
 
-    # STEP 5: Call GPT
     print("🤖 Asking GPT...\n")
-
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        max_tokens=1024,
-        messages=messages,  # System message + conversation + new question
+    response = client.responses.create(
+        model=MODEL,
+        max_output_tokens=1024,
+        instructions=instructions,
+        input=input_messages,
     )
 
-    answer = response.choices[0].message.content
+    answer = response.output_text
 
-    # STEP 6: Add user question and response to conversation history
-    # Note: We don't store the system message in history
-    # We regenerate it each turn with fresh documents
+    # STEP 4: Add user question and response to memory
     conversation_history.append({"role": "user", "content": question})
     conversation_history.append({"role": "assistant", "content": answer})
 
@@ -155,7 +150,6 @@ Instructions:
 
 conversation_history = []
 
-# TURN 1: Initial question
 print("=" * 80)
 print("TURN 1")
 print("=" * 80)
@@ -169,7 +163,6 @@ print(f"{'='*80}")
 print(f"GPT: {answer1}")
 print(f"{'='*80}\n")
 
-# TURN 2: Follow-up question using pronoun "it"
 print("=" * 80)
 print("TURN 2")
 print("=" * 80)
@@ -183,7 +176,6 @@ print(f"{'='*80}")
 print(f"GPT: {answer2}")
 print(f"{'='*80}\n")
 
-# TURN 3: Another follow-up
 print("=" * 80)
 print("TURN 3")
 print("=" * 80)
@@ -200,24 +192,18 @@ print(f"{'='*80}\n")
 """
 WHAT YOU JUST LEARNED:
 
-1. OpenAI vs Anthropic system message difference:
-   - Anthropic: system parameter separate from messages
-   - OpenAI: system message goes IN the messages array
-   - Both achieve the same result
+1. Responses API + instructions cleanly maps to conversational RAG
+   - instructions: current retrieved document context
+   - input: conversation history + new question
 
-2. The pattern is identical:
-   - Fresh document retrieval each turn
-   - Maintain conversation history
-   - AI sees both documents + history
+2. Pattern is still identical to Anthropic
+   - Fresh retrieval each turn
+   - Cumulative conversation memory
+   - AI uses both docs + history
 
-3. Implementation strategy:
-   - conversation_history: Only stores user/assistant exchanges
-   - System message: Built fresh each turn with new documents
-   - Final messages array: system + history + new question
-
-4. This handles complex follow-ups:
-   "What is X?" → "Who created it?" → "When?" → "Why?"
-   Each question triggers fresh retrieval, but AI remembers context
+3. Memory remains explicit
+   - You can inspect and debug conversation_history directly
+   - That keeps the fundamentals transparent
 
 NEXT STEP: Learn streaming to make responses feel more alive
 """

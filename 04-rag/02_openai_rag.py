@@ -1,8 +1,8 @@
 """
-RAG (RETRIEVAL AUGMENTED GENERATION) - OPENAI GPT
+RAG (RETRIEVAL AUGMENTED GENERATION) - OPENAI GPT (Responses API)
 
 Same RAG pattern as Anthropic: search + put in prompt + ask AI.
-The only difference is the API syntax.
+The only difference is API syntax.
 """
 
 import os
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from sample_documents import DOCUMENTS
 
 load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -31,19 +32,13 @@ def simple_keyword_search(query: str, documents: list, max_results: int = 3) -> 
     results = []
 
     for doc in documents:
-        # Combine title and content for searching
         searchable_text = (doc["title"] + " " + doc["content"]).lower()
-
-        # Count how many query words appear in the document
         matches = sum(1 for word in query_words if word in searchable_text)
 
         if matches > 0:
             results.append({"doc": doc, "score": matches})
 
-    # Sort by relevance
     results.sort(key=lambda x: x["score"], reverse=True)
-
-    # Return top N results
     return [r["doc"] for r in results[:max_results]]
 
 
@@ -54,7 +49,7 @@ def simple_keyword_search(query: str, documents: list, max_results: int = 3) -> 
 
 def rag_query(question: str, documents: list, max_context_docs: int = 3) -> str:
     """
-    RAG in 3 steps (same pattern as Anthropic):
+    RAG in 3 steps:
 
     1. RETRIEVE: Find relevant documents
     2. AUGMENT: Put them in the prompt
@@ -66,7 +61,7 @@ def rag_query(question: str, documents: list, max_context_docs: int = 3) -> str:
     print(f"{'='*80}\n")
 
     # STEP 1: RETRIEVE
-    print(f"📚 STEP 1: RETRIEVE")
+    print("📚 STEP 1: RETRIEVE")
     print(f"Searching for documents related to: '{question}'\n")
 
     relevant_docs = simple_keyword_search(question, documents, max_context_docs)
@@ -80,7 +75,7 @@ def rag_query(question: str, documents: list, max_context_docs: int = 3) -> str:
         return "I couldn't find any relevant information to answer your question."
 
     # STEP 2: AUGMENT
-    print(f"\n📝 STEP 2: AUGMENT")
+    print("\n📝 STEP 2: AUGMENT")
     print("Building context from retrieved documents...\n")
 
     context = ""
@@ -92,10 +87,9 @@ def rag_query(question: str, documents: list, max_context_docs: int = 3) -> str:
     print(f"Context length: {len(context)} characters")
 
     # STEP 3: GENERATE
-    print(f"\n🤖 STEP 3: GENERATE")
+    print("\n🤖 STEP 3: GENERATE")
     print("Sending to GPT with context...\n")
 
-    # Build the prompt with context
     prompt = f"""Based on the following documents, please answer the question.
 
 Documents:
@@ -109,16 +103,15 @@ Instructions:
 - Be specific and cite which document you're referencing
 - Keep your answer concise and clear"""
 
-    # Call GPT (just a normal API call!)
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
+    response = client.responses.create(
+        model=MODEL,
+        max_output_tokens=1024,
+        input=prompt,
     )
 
-    answer = response.choices[0].message.content
+    answer = response.output_text
 
-    print(f"✅ Answer generated!\n")
+    print("✅ Answer generated!\n")
 
     return answer
 
@@ -127,22 +120,17 @@ Instructions:
 # USAGE EXAMPLE
 # =============================================================================
 
-# Ask a question about our documents
 question = "What is FastAPI and who created it?"
-
 print(f"Question: {question}")
 
-# Run RAG
 answer = rag_query(question, DOCUMENTS, max_context_docs=3)
 
-# Display the answer
 print(f"{'='*80}")
 print("GPT'S ANSWER:")
 print(f"{'='*80}")
 print(answer)
 print(f"{'='*80}\n")
 
-# Try another question
 print("\n" + "=" * 80)
 question2 = "What are the main types of machine learning?"
 print(f"Question: {question2}")
@@ -159,25 +147,15 @@ print(f"{'='*80}\n")
 WHAT YOU JUST LEARNED:
 
 1. RAG is the same across providers
-   - Anthropic and OpenAI use the same three-step pattern
-   - Only difference is API method names
-   - The retrieval logic is completely identical
+   - Same three-step pattern
+   - Different SDK syntax only
 
-2. The retrieval step is provider-agnostic
-   - simple_keyword_search() works with any AI provider
-   - You could swap Claude for GPT or vice versa
-   - The search logic doesn't care about the LLM
+2. Responses API handles generation cleanly
+   - Pass full prompt in input
+   - Read final text from response.output_text
 
-3. When to use embeddings vs keyword search:
-   - Keyword search: < 10,000 documents, exact matches matter
-   - Embeddings: > 10,000 documents, semantic meaning matters
-   - Many production systems start with keywords, add embeddings later
-
-4. You can build this yourself
-   - No framework dependency
-   - Full control over retrieval logic
-   - Easy to debug and optimize
-   - Clear understanding of what's happening
+3. Retrieval is provider-agnostic
+   - You can swap providers without changing search logic
 
 NEXT STEP: Add conversation memory for follow-up questions (Conversational RAG)
 """

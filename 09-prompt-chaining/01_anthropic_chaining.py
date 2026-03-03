@@ -286,15 +286,6 @@ WHAT YOU JUST LEARNED:
 
    But you don't NEED them to build this.
 
-CONGRATULATIONS! You've completed all 8 foundational concepts:
-1. Basic API calls
-2. Conversation memory
-3. Structured outputs
-4. Tool calling
-5. RAG
-6. Conversational RAG
-7. Streaming
-8. Prompt chaining
-
-You now understand how AI applications actually work. Go build something!
+You've completed steps 1-9 of the curriculum.
+NEXT STEP: Build the full integration project in step 10 (OpenAI capstone).
 """

@@ -37,17 +37,8 @@ All of these are just API calls with Python logic between them.
 
 📖 [Prompt Chaining: Building Multi-Step Workflows](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)
 
-## What's Next?
+## Next Step
 
-You've completed all 8 foundational concepts! You now understand:
+You are ready for the full integration challenge:
 
-1. Basic API calls
-2. Conversation memory
-3. Structured outputs
-4. Tool calling
-5. RAG
-6. Conversational RAG
-7. Streaming
-8. Prompt chaining
-
-These patterns combine to build any AI application. Frameworks may add conveniences, but you now understand what's actually happening under the hood.
+👉 [10 - Capstone (OpenAI-only)](../10-capstone-openai)

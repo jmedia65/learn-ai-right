@@ -225,5 +225,6 @@ WHAT YOU JUST LEARNED:
    - Chaining + RAG
    - Chaining + tool calling
 
-CONGRATULATIONS! You've completed all core foundational patterns.
+You've completed steps 1-9 of the curriculum.
+NEXT STEP: Build the full integration project in step 10 (OpenAI capstone).
 """

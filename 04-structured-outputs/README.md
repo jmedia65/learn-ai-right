@@ -9,8 +9,8 @@ Instead of hoping the model returns a format you can parse, you define a schema 
 ## Why This Module Exists
 
 This is a bridge between:
-- **02 - Conversation Memory** (context)
-- **03 - Tool Calling** (actions)
+- **03 - Memory with `previous_response_id`** (state convenience)
+- **05 - Tool Calling** (actions)
 
 If students skip structure, tool calling and workflows feel brittle fast.
 
@@ -36,10 +36,10 @@ Structured outputs are often the missing step between beginner demos and real ap
 
 ## Recommended Placement
 
-Take this module **after 02** and **before 03**.
+Take this module **after 03** and **before 05**.
 
 ## Next Step
 
 Now you're ready for action-taking workflows:
 
-👉 [03 - Tool Calling](../03-tool-calling)
+👉 [05 - Tool Calling](../05-tool-calling)

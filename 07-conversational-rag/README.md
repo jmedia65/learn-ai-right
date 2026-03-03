@@ -20,7 +20,7 @@ This lets users ask follow-up questions like "Who created it?" and the AI unders
 - [01_anthropic_conversational_rag.py](./01_anthropic_conversational_rag.py) - Conversational RAG with Claude
 - [02_openai_conversational_rag.py](./02_openai_conversational_rag.py) - Conversational RAG with GPT
 
-Both examples use the same documents from module 04.
+Both examples use the same documents from module 06.
 
 ## Key Takeaway
 
@@ -44,4 +44,4 @@ Fresh documents + conversation memory = natural follow-up questions.
 
 Make your AI responses feel more alive with streaming:
 
-👉 [06 - Streaming](../06-streaming)
+👉 [08 - Streaming](../08-streaming)

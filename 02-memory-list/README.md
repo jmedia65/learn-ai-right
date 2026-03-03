@@ -51,6 +51,6 @@ That's it. No magic. Just a Python list and sequential API calls.
 
 ## Next Step
 
-Before tool calling, learn how to make model outputs reliable and structured:
+Now learn OpenAI's memory chaining convenience with `previous_response_id`:
 
-👉 [02b - Structured Outputs](../02b-structured-outputs)
+👉 [03 - Memory with `previous_response_id`](../03-memory-previous-response-id)

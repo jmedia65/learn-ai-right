@@ -40,4 +40,4 @@ The total processing time is similar, but the user experience is dramatically be
 
 Build complex multi-step workflows with prompt chaining:
 
-👉 [07 - Prompt Chaining](../07-prompt-chaining)
+👉 [09 - Prompt Chaining](../09-prompt-chaining)

@@ -42,4 +42,4 @@ This prevents hallucinations and grounds responses in your actual data.
 
 Add conversation memory to your RAG system for follow-up questions:
 
-👉 [05 - Conversational RAG](../05-conversational-rag)
+👉 [07 - Conversational RAG](../07-conversational-rag)

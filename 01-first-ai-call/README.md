@@ -35,4 +35,4 @@ Everything else in AI development builds on this pattern.
 
 Once you understand basic API calls, learn how to give AI memory:
 
-👉 [02 - Conversation Memory](../02-conversation-memory)
+👉 [02 - Conversation Memory](../02-memory-list)

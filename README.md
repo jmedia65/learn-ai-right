@@ -41,18 +41,20 @@ That's it. No magic. Just API calls and basic programming.
 
 ## What You'll Learn
 
-This course covers 8 foundational concepts, each with working code examples for both Anthropic's Claude and OpenAI's GPT:
+This course now follows a clean **10-step canonical path**:
 
-1. **Your First AI Call** - The basic pattern every AI application uses
-2. **Conversation Memory** - How chatbots remember previous messages
-3. **Structured Outputs** - Turning model output into typed, validated data
-4. **Tool Calling** - Making AI take actions through functions
-5. **RAG** - Making AI answer questions from your documents
-6. **Conversational RAG** - Adding follow-up questions to document Q&A
-7. **Streaming** - Displaying AI responses word-by-word in real-time
-8. **Prompt Chaining** - Building multi-step AI workflows
+1. **First AI Call** - The basic pattern every AI application uses
+2. **Memory as List** - The stateless truth behind chatbots
+3. **Memory with `previous_response_id`** - OpenAI convenience chaining
+4. **Structured Outputs** - Turning model output into typed, validated data
+5. **Tool Calling** - Making AI take actions through functions
+6. **RAG** - Making AI answer questions from your documents
+7. **Conversational RAG** - Adding follow-up questions to document Q&A
+8. **Streaming** - Displaying AI responses word-by-word in real-time
+9. **Prompt Chaining** - Building multi-step AI workflows
+10. **Capstone (OpenAI-only)** - One end-to-end project combining everything
 
-Each concept builds on the previous one. By the end, you'll understand how production AI systems work.
+By the end, you'll understand how production AI systems work under the hood.
 
 ## API Versions in This Repo
 
@@ -111,7 +113,7 @@ Get API keys:
 **4. Start with the first module**
 
 ```bash
-cd 01-your-first-ai-call
+cd 01-first-ai-call
 python 01_anthropic_basic.py
 ```
 
@@ -120,57 +122,65 @@ python 01_anthropic_basic.py
 Each module contains:
 
 - A README explaining the concept
-- Python examples for Anthropic Claude
-- Python examples for OpenAI GPT
+- OpenAI examples (all steps)
+- Anthropic companion examples (most steps)
 - Heavily commented code showing exactly what's happening
 
-Work through them in this recommended order:
+Work through them in order:
 
-### [01 - Your First AI Call](./01-your-first-ai-call)
+### [01 - First AI Call](./01-first-ai-call)
 
 Learn the foundational pattern: initialize → call → extract response.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/your-first-ai-call-the-foundation-of-everything)
 
-### [02 - Conversation Memory](./02-conversation-memory)
+### [02 - Memory as List](./02-memory-list)
 
 Understand how chatbots remember context (spoiler: it's just a list).
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)
 
-### [02b - Structured Outputs](./02b-structured-outputs)
+### [03 - Memory with `previous_response_id` (OpenAI)](./03-memory-previous-response-id)
 
-Bridge module: learn to get typed, validated outputs before tool calling.
+Learn OpenAI's state-chaining convenience API after mastering list-based memory.
 
-### [03 - Tool Calling](./03-tool-calling)
+### [04 - Structured Outputs](./04-structured-outputs)
+
+Bridge module: get typed, validated outputs before tool calling.
+
+### [05 - Tool Calling](./05-tool-calling)
 
 Make AI take actions by calling your Python functions.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/tool-calling-making-ai-do-things)
 
-### [04 - RAG](./04-rag)
+### [06 - RAG](./06-rag)
 
 Make AI answer questions from your own documents.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/rag-making-ai-answer-from-your-documents)
 
-### [05 - Conversational RAG](./05-conversational-rag)
+### [07 - Conversational RAG](./07-conversational-rag)
 
 Add follow-up questions to your document Q&A system.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/conversational-rag-adding-follow-up-questions)
 
-### [06 - Streaming](./06-streaming)
+### [08 - Streaming](./08-streaming)
 
 Display AI responses in real-time, word by word.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/streaming-responses-making-ai-feel-alive)
 
-### [07 - Prompt Chaining](./07-prompt-chaining)
+### [09 - Prompt Chaining](./09-prompt-chaining)
 
 Build multi-step AI workflows and "agent" systems.
 
 📖 [Read the full article](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)
+
+### [10 - Capstone (OpenAI-only)](./10-capstone-openai)
+
+Build one complete AI Learning Coach that combines memory, structured outputs, tools, RAG, streaming, and chaining.
 
 ## About
 

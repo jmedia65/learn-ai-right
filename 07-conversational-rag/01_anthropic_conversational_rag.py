@@ -1,20 +1,23 @@
 """
-CONVERSATIONAL RAG - OPENAI GPT (Responses API)
+CONVERSATIONAL RAG - ANTHROPIC CLAUDE
 
-Same pattern as Anthropic: Fresh retrieval + conversation memory.
-OpenAI difference: use instructions + input with Responses API.
+Combining RAG + conversation memory for follow-up questions.
+
+The pattern:
+- Fresh document retrieval on each turn (for new question)
+- Maintain conversation history (for context)
+- AI uses BOTH to understand and answer
 """
 
 import os
-from openai import OpenAI
+from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # =============================================================================
-# SAMPLE DOCUMENTS (same as module 04)
+# SAMPLE DOCUMENTS (same as module 06)
 # =============================================================================
 
 DOCUMENTS = [
@@ -51,7 +54,7 @@ DOCUMENTS = [
 ]
 
 # =============================================================================
-# RETRIEVAL - Simple keyword search (identical to Anthropic version)
+# RETRIEVAL - Simple keyword search (same as module 06)
 # =============================================================================
 
 
@@ -72,7 +75,7 @@ def simple_keyword_search(query: str, documents: list, max_results: int = 3) -> 
 
 
 # =============================================================================
-# CONVERSATIONAL RAG FUNCTION (OpenAI Responses API)
+# CONVERSATIONAL RAG FUNCTION
 # =============================================================================
 
 
@@ -81,10 +84,13 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     Conversational RAG: Fresh retrieval + conversation memory.
 
     On each turn:
-    1. Retrieve docs for THIS question
-    2. Build instructions from retrieved docs
-    3. Send full conversation history + new question
-    4. Append user + assistant messages to history
+    1. Retrieve documents for THIS question (fresh)
+    2. Build system prompt with current documents
+    3. Add user question to conversation history
+    4. Send history + system prompt to Claude
+    5. Add response to history
+
+    This lets Claude use both the documents AND conversation context.
     """
 
     print(f"\n{'='*80}")
@@ -92,6 +98,7 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     print(f"{'='*80}\n")
 
     # STEP 1: Retrieve documents for THIS question
+    # This happens fresh on every turn
     print("📚 Retrieving relevant documents...")
     relevant_docs = simple_keyword_search(question, documents, max_results=3)
 
@@ -112,33 +119,38 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     for doc in relevant_docs:
         context += f"{doc['title']}:\n{doc['content'].strip()}\n\n"
 
-    instructions = f"""You are a helpful assistant that answers questions based on provided documents.
+    # STEP 3: Create system prompt with CURRENT documents
+    # This changes on every turn based on what was retrieved
+    system_prompt = f"""You are a helpful assistant that answers questions based on provided documents.
 
 Available documents:
 {context}
 
 Instructions:
 - Answer based on the documents provided
-- Use conversation history for context (e.g., understanding pronouns like 'it')
+- Use conversation history for context (e.g., understanding pronouns like "it")
 - If asked a follow-up question, remember previous exchanges
 - Cite which document you're using when possible"""
 
-    # STEP 3: Build input with full history + new question
-    # History remains explicit so students can see memory mechanics.
-    input_messages = conversation_history + [{"role": "user", "content": question}]
+    # STEP 4: Add user question to conversation history
+    conversation_history.append({"role": "user", "content": question})
 
-    print("🤖 Asking GPT...\n")
-    response = client.responses.create(
-        model=MODEL,
-        max_output_tokens=1024,
-        instructions=instructions,
-        input=input_messages,
+    # STEP 5: Call Claude with system prompt + full conversation history
+    # Claude sees:
+    # - The documents (via system prompt)
+    # - The entire conversation (via messages)
+    print("🤖 Asking Claude...\n")
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1024,
+        system=system_prompt,  # Documents go here (refreshed each turn)
+        messages=conversation_history,  # Conversation history goes here
     )
 
-    answer = response.output_text
+    answer = response.content[0].text
 
-    # STEP 4: Add user question and response to memory
-    conversation_history.append({"role": "user", "content": question})
+    # STEP 6: Add Claude's response to history
     conversation_history.append({"role": "assistant", "content": answer})
 
     return answer, conversation_history
@@ -150,6 +162,7 @@ Instructions:
 
 conversation_history = []
 
+# TURN 1: Initial question
 print("=" * 80)
 print("TURN 1")
 print("=" * 80)
@@ -160,9 +173,12 @@ answer1, conversation_history = conversational_rag(
 )
 
 print(f"{'='*80}")
-print(f"GPT: {answer1}")
+print(f"CLAUDE: {answer1}")
 print(f"{'='*80}\n")
 
+# TURN 2: Follow-up question using pronoun "it"
+# Claude needs conversation history to know "it" = FastAPI
+# But we also retrieve fresh documents for this specific question
 print("=" * 80)
 print("TURN 2")
 print("=" * 80)
@@ -173,9 +189,10 @@ answer2, conversation_history = conversational_rag(
 )
 
 print(f"{'='*80}")
-print(f"GPT: {answer2}")
+print(f"CLAUDE: {answer2}")
 print(f"{'='*80}\n")
 
+# TURN 3: Another follow-up
 print("=" * 80)
 print("TURN 3")
 print("=" * 80)
@@ -186,24 +203,32 @@ answer3, conversation_history = conversational_rag(
 )
 
 print(f"{'='*80}")
-print(f"GPT: {answer3}")
+print(f"CLAUDE: {answer3}")
 print(f"{'='*80}\n")
 
 """
 WHAT YOU JUST LEARNED:
 
-1. Responses API + instructions cleanly maps to conversational RAG
-   - instructions: current retrieved document context
-   - input: conversation history + new question
+1. Conversational RAG = RAG + Memory
+   - Each turn: retrieve fresh documents for the NEW question
+   - Each turn: send the FULL conversation history
+   - AI uses BOTH to understand context and answer
 
-2. Pattern is still identical to Anthropic
-   - Fresh retrieval each turn
-   - Cumulative conversation memory
-   - AI uses both docs + history
+2. How follow-up questions work:
+   Turn 1: "What is FastAPI?" → Retrieves FastAPI doc
+   Turn 2: "Who created it?" → Retrieves docs for "created it"
+                              → But conversation history tells Claude "it" = FastAPI
+   Turn 3: "What is it built on?" → Same pattern
 
-3. Memory remains explicit
-   - You can inspect and debug conversation_history directly
-   - That keeps the fundamentals transparent
+3. The key is separating concerns:
+   - Document retrieval: Fresh on every turn (based on new question)
+   - Conversation memory: Cumulative (keeps growing)
+   - AI sees both: Documents + full conversation history
+
+4. System prompt vs messages:
+   - System prompt: Contains the documents (changes each turn)
+   - Messages: Contains the conversation (grows each turn)
+   - Anthropic lets you pass both separately
 
 NEXT STEP: Learn streaming to make responses feel more alive
 """

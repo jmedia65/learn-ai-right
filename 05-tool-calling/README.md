@@ -43,4 +43,4 @@ Loop until AI stops requesting tools.
 
 Now that AI can take actions, let's make it answer questions from your documents:
 
-👉 [04 - RAG](../04-rag)
+👉 [06 - RAG](../06-rag)

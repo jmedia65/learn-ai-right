@@ -34,6 +34,20 @@ RAG in three steps:
 
 This prevents hallucinations and grounds responses in your actual data.
 
+## Quick Exercise (10 Minutes)
+
+1. Add one new document to `sample_documents.py`.
+2. Ask one answerable question and one unanswerable question.
+3. Tune `max_context_docs` from 1 to 3 and compare response quality.
+
+Done when: you can explain how retrieval choice changes generation quality.
+
+## What Breaks in Production
+
+- Weak retrieval: irrelevant docs produce confident wrong answers.
+- Untrusted docs: prompt-injection text can contaminate outputs.
+- Stale corpus: answers lag behind source truth.
+
 ## Read the Full Article
 
 📖 [RAG: Making AI Answer From Your Documents](https://maxbraglia.substack.com/p/rag-making-ai-answer-from-your-documents)

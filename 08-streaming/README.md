@@ -32,6 +32,20 @@ Streaming in three steps:
 
 The total processing time is similar, but the user experience is dramatically better.
 
+## Quick Exercise (10 Minutes)
+
+1. Time non-streaming vs streaming with `time.perf_counter()`.
+2. Record time-to-first-text and total completion time.
+3. Keep accumulating full text and append it to conversation history.
+
+Done when: you can quantify UX improvement even when total latency is similar.
+
+## What Breaks in Production
+
+- Dropped stream events: partial outputs shown to users.
+- No final accumulation: follow-up context is incomplete.
+- Backpressure issues: UI freezes on long streams.
+
 ## Read the Full Article
 
 📖 [Streaming Responses: Making AI Feel Alive](https://maxbraglia.substack.com/p/streaming-responses-making-ai-feel-alive)

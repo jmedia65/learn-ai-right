@@ -29,6 +29,20 @@ You should understand both.
 
 `previous_response_id` is not magic memory. It is a convenience API for conversation chaining.
 
+## Quick Exercise (10 Minutes)
+
+1. Run the scripted file and print each `response.id`.
+2. In the loop file, reset `previous_response_id = None` after turn 3.
+3. Ask a follow-up and observe the context reset.
+
+Done when: you can explain exactly what context is preserved and what is lost.
+
+## What Breaks in Production
+
+- Lost chain ID: conversation continuity disappears.
+- Forked conversations sharing one ID: state gets confusing.
+- Provider lock-in: this convenience pattern is not universal across SDKs.
+
 ## Next Step
 
 Turn model output into reliable typed data:

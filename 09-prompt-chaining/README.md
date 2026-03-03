@@ -33,6 +33,20 @@ Common prompt chaining patterns:
 
 All of these are just API calls with Python logic between them.
 
+## Quick Exercise (10 Minutes)
+
+1. Add a fourth step: "fact-check draft against research."
+2. If fact-check fails, branch to rewrite.
+3. Print each intermediate output length and summary.
+
+Done when: you can debug the chain step-by-step instead of only reading final output.
+
+## What Breaks in Production
+
+- Error propagation: a weak early step poisons later steps.
+- No observability: hard to diagnose which step failed.
+- Cost sprawl: many chained calls can become expensive quickly.
+
 ## Read the Full Article
 
 📖 [Prompt Chaining: Building Multi-Step Workflows](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)

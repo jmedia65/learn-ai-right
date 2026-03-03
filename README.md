@@ -125,6 +125,7 @@ Each module contains:
 - OpenAI examples (all steps)
 - Anthropic companion examples (most steps)
 - Heavily commented code showing exactly what's happening
+- A `Quick Exercise` and `What Breaks in Production` section for deliberate practice
 
 Work through them in order:
 

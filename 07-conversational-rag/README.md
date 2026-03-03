@@ -36,6 +36,20 @@ Conversational RAG pattern:
 
 Fresh documents + conversation memory = natural follow-up questions.
 
+## Quick Exercise (10 Minutes)
+
+1. Ask: "What is FastAPI?" then "Who created it?" then "What is it built on?"
+2. Clear conversation history after turn 1 and rerun.
+3. Compare how follow-up accuracy changes.
+
+Done when: you can show why retrieval alone is not enough for follow-ups.
+
+## What Breaks in Production
+
+- History bloat: context gets expensive and noisy.
+- Reference ambiguity: pronouns like "it" resolve incorrectly.
+- Mixing stale and fresh context: answers become inconsistent.
+
 ## Read the Full Article
 
 📖 [Conversational RAG: Adding Follow-Up Questions](https://maxbraglia.substack.com/p/conversational-rag-adding-follow-up-questions)

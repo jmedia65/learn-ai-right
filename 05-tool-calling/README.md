@@ -35,6 +35,20 @@ Every "AI agent" system follows this pattern:
 
 Loop until AI stops requesting tools.
 
+## Quick Exercise (10 Minutes)
+
+1. Add a third tool (e.g., `get_course_topic(module_id)`).
+2. Ask a question that should trigger two tool calls.
+3. Print tool call arguments and results for each iteration.
+
+Done when: you can trace the full AI-decides -> you-execute loop.
+
+## What Breaks in Production
+
+- Invalid tool args: JSON parsing or schema mismatch errors.
+- Infinite tool loops: model keeps requesting tools without termination.
+- Unsafe execution: unvalidated arguments can trigger bad side effects.
+
 ## Read the Full Article
 
 📖 [Tool Calling: Making AI DO Things](https://maxbraglia.substack.com/p/tool-calling-making-ai-do-things)

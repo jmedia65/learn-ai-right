@@ -45,6 +45,20 @@ Every chatbot, from ChatGPT to custom applications, follows this simple loop:
 
 That's it. No magic. Just a Python list and sequential API calls.
 
+## Quick Exercise (10 Minutes)
+
+1. Add a fifth turn: ask "What are my interests so far?"
+2. Print `len(conversation_history)` after each turn.
+3. Keep only the most recent 6 messages and compare answer quality.
+
+Done when: you can show the tradeoff between context quality and token cost.
+
+## What Breaks in Production
+
+- History grows forever: context-window and cost blow up.
+- Missing assistant messages: memory quality drops sharply.
+- No truncation strategy: long chats become slow and expensive.
+
 ## Read the Full Article
 
 📖 [AI Conversation Memory: It's Just a List](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)

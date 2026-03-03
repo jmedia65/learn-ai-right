@@ -27,6 +27,20 @@ You don't need a framework to talk to an AI. You need:
 
 Everything else in AI development builds on this pattern.
 
+## Quick Exercise (10 Minutes)
+
+1. Change the prompt to: "Explain REST vs GraphQL in two sentences."
+2. Run both scripts and compare output style.
+3. Print model + token usage from each response object.
+
+Done when: you can point to where the actual text lives in each SDK response.
+
+## What Breaks in Production
+
+- Missing/invalid API keys: request fails before generation.
+- Hard-coded model IDs: examples go stale over time.
+- No output checks: empty/partial responses can silently propagate.
+
 ## Read the Full Article
 
 📖 [Your First AI Call: The Foundation of Everything](https://maxbraglia.substack.com/p/your-first-ai-call-the-foundation-of-everything)

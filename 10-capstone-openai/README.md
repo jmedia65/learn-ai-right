@@ -27,6 +27,20 @@ cd 10-capstone-openai
 python 01_openai_capstone_learning_coach.py
 ```
 
+## Quick Exercise (15 Minutes)
+
+1. Add one new lesson document to the capstone corpus.
+2. Add one new tool (e.g., `get_study_plan(level)`).
+3. Ask a question that triggers retrieval, tool use, and streaming.
+
+Done when: one user request clearly passes through routing -> retrieval -> tools -> polished streamed answer.
+
+## What Breaks in Production
+
+- Orchestration coupling: one step change can break the full pipeline.
+- Missing evaluation: polished output can still be wrong.
+- Retry/timeouts not handled: long multi-step flows fail unpredictably.
+
 ## Next Challenges
 
 - Replace fake tools with real APIs (calendar, LMS, docs index)

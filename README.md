@@ -133,13 +133,9 @@ Work through them in order:
 
 Learn the foundational pattern: initialize → call → extract response.
 
-📖 [Read the full article](https://maxbraglia.substack.com/p/your-first-ai-call-the-foundation-of-everything)
-
 ### [02 - Memory as List](./02-memory-list)
 
 Understand how chatbots remember context (spoiler: it's just a list).
-
-📖 [Read the full article](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)
 
 ### [03 - Memory with `previous_response_id` (OpenAI)](./03-memory-previous-response-id)
 
@@ -153,31 +149,21 @@ Bridge module: get typed, validated outputs before tool calling.
 
 Make AI take actions by calling your Python functions.
 
-📖 [Read the full article](https://maxbraglia.substack.com/p/tool-calling-making-ai-do-things)
-
 ### [06 - RAG](./06-rag)
 
 Make AI answer questions from your own documents.
-
-📖 [Read the full article](https://maxbraglia.substack.com/p/rag-making-ai-answer-from-your-documents)
 
 ### [07 - Conversational RAG](./07-conversational-rag)
 
 Add follow-up questions to your document Q&A system.
 
-📖 [Read the full article](https://maxbraglia.substack.com/p/conversational-rag-adding-follow-up-questions)
-
 ### [08 - Streaming](./08-streaming)
 
 Display AI responses in real-time, word by word.
 
-📖 [Read the full article](https://maxbraglia.substack.com/p/streaming-responses-making-ai-feel-alive)
-
 ### [09 - Prompt Chaining](./09-prompt-chaining)
 
 Build multi-step AI workflows and "agent" systems.
-
-📖 [Read the full article](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)
 
 ### [10 - Capstone (OpenAI-only)](./10-capstone-openai)
 

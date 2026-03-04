@@ -49,10 +49,6 @@ Done when: you can trace the full AI-decides -> you-execute loop.
 - Infinite tool loops: model keeps requesting tools without termination.
 - Unsafe execution: unvalidated arguments can trigger bad side effects.
 
-## Read the Full Article
-
-📖 [Tool Calling: Making AI DO Things](https://maxbraglia.substack.com/p/tool-calling-making-ai-do-things)
-
 ## Next Step
 
 Now that AI can take actions, let's make it answer questions from your documents:

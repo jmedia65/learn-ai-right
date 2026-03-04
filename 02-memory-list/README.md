@@ -17,12 +17,14 @@ LLMs like Claude and GPT are stateless—they have no memory between API calls. 
 ## Files in This Module
 
 ### Part 1: Turn-by-Turn Conversations (Scripted Examples)
+
 These examples show 4 hardcoded conversation turns to demonstrate the pattern clearly:
 
 - [01_anthropic_conversation.py](./01_anthropic_conversation.py) - Multi-turn conversation with Claude (4 scripted turns)
 - [02_openai_conversation.py](./02_openai_conversation.py) - Multi-turn conversation with GPT (4 scripted turns)
 
 ### Part 2: Interactive Chat Loops (Practical Application)
+
 These examples wrap the same pattern in a `while` loop for real-time interaction:
 
 - [03_anthropic_while_loop.py](./03_anthropic_while_loop.py) - Interactive chat with Claude (user input)
@@ -58,10 +60,6 @@ Done when: you can show the tradeoff between context quality and token cost.
 - History grows forever: context-window and cost blow up.
 - Missing assistant messages: memory quality drops sharply.
 - No truncation strategy: long chats become slow and expensive.
-
-## Read the Full Article
-
-📖 [AI Conversation Memory: It's Just a List](https://maxbraglia.substack.com/p/ai-conversation-memory-its-just-a-list)
 
 ## Next Step
 

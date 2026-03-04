@@ -57,9 +57,20 @@ print("=" * 80)
 print(raw_output)
 print()
 
+# Claude may wrap JSON in markdown code fences (```json ... ```).
+# Strip those fences so json.loads() gets clean JSON text.
+clean_output = raw_output.strip()
+if clean_output.startswith("```"):
+    lines = clean_output.splitlines()
+    if lines:
+        lines = lines[1:]  # remove opening fence line (```json or ```)
+    if lines and lines[-1].strip().startswith("```"):
+        lines = lines[:-1]  # remove closing fence line
+    clean_output = "\n".join(lines).strip()
+
 # Parse JSON from model output
 try:
-    parsed_json = json.loads(raw_output)
+    parsed_json = json.loads(clean_output)
 except json.JSONDecodeError as e:
     print("JSON parsing failed:", e)
     raise

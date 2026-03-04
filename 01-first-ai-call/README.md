@@ -21,6 +21,7 @@ Both examples do the same thing using different APIs. Compare them to see the si
 ## Key Takeaway
 
 You don't need a framework to talk to an AI. You need:
+
 1. An API client (Anthropic or OpenAI)
 2. Input (a string or a messages list)
 3. Code to extract the response
@@ -40,10 +41,6 @@ Done when: you can point to where the actual text lives in each SDK response.
 - Missing/invalid API keys: request fails before generation.
 - Hard-coded model IDs: examples go stale over time.
 - No output checks: empty/partial responses can silently propagate.
-
-## Read the Full Article
-
-📖 [Your First AI Call: The Foundation of Everything](https://maxbraglia.substack.com/p/your-first-ai-call-the-foundation-of-everything)
 
 ## Next Step
 

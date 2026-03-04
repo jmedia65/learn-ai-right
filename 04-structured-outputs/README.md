@@ -9,6 +9,7 @@ Instead of hoping the model returns a format you can parse, you define a schema 
 ## Why This Module Exists
 
 This is a bridge between:
+
 - **03 - Memory with `previous_response_id`** (state convenience)
 - **05 - Tool Calling** (actions)
 
@@ -47,10 +48,7 @@ Done when: your code rejects invalid output instead of silently accepting it.
 - Schema drift: prompts and validators stop matching.
 - Trusting raw JSON: malformed outputs break downstream logic.
 - Weak constraints: free-form values reduce reliability.
-
-## Recommended Placement
-
-Take this module **after 03** and **before 05**.
+- Some providers may wrap JSON in markdown fences (```json ... ```), so you may need a small cleanup step before `json.loads()`.
 
 ## Next Step
 

@@ -50,10 +50,6 @@ Done when: you can show why retrieval alone is not enough for follow-ups.
 - Reference ambiguity: pronouns like "it" resolve incorrectly.
 - Mixing stale and fresh context: answers become inconsistent.
 
-## Read the Full Article
-
-📖 [Conversational RAG: Adding Follow-Up Questions](https://maxbraglia.substack.com/p/conversational-rag-adding-follow-up-questions)
-
 ## Next Step
 
 Make your AI responses feel more alive with streaming:

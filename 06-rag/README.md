@@ -48,10 +48,6 @@ Done when: you can explain how retrieval choice changes generation quality.
 - Untrusted docs: prompt-injection text can contaminate outputs.
 - Stale corpus: answers lag behind source truth.
 
-## Read the Full Article
-
-📖 [RAG: Making AI Answer From Your Documents](https://maxbraglia.substack.com/p/rag-making-ai-answer-from-your-documents)
-
 ## Next Step
 
 Add conversation memory to your RAG system for follow-up questions:

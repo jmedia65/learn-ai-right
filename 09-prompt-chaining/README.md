@@ -47,10 +47,6 @@ Done when: you can debug the chain step-by-step instead of only reading final ou
 - No observability: hard to diagnose which step failed.
 - Cost sprawl: many chained calls can become expensive quickly.
 
-## Read the Full Article
-
-📖 [Prompt Chaining: Building Multi-Step Workflows](https://maxbraglia.substack.com/p/prompt-chaining-building-multi-step-workflows)
-
 ## Next Step
 
 You are ready for the full integration challenge:

@@ -46,10 +46,6 @@ Done when: you can quantify UX improvement even when total latency is similar.
 - No final accumulation: follow-up context is incomplete.
 - Backpressure issues: UI freezes on long streams.
 
-## Read the Full Article
-
-📖 [Streaming Responses: Making AI Feel Alive](https://maxbraglia.substack.com/p/streaming-responses-making-ai-feel-alive)
-
 ## Next Step
 
 Build complex multi-step workflows with prompt chaining:

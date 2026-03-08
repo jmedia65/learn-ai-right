@@ -1,4 +1,4 @@
-# Learn AI Right: AI Development Without Frameworks
+# Learn AI Development Without Frameworks
 
 **Learn AI fundamentals without frameworks. Just Python, APIs, and clarity.**
 

@@ -12,11 +12,11 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # This is your "memory" - just a Python list
-# It will hold all user and assistant messages
+# It will hold user messages and every output item returned by the model.
 conversation_history = []
 
 # =============================================================================
@@ -36,16 +36,19 @@ print(f"User: {user_message_1}")
 # Step 2: Send the ENTIRE conversation history
 response_1 = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
+    store=False,
 )
+if response_1.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response_1.status}")
 
 # Step 3: Extract GPT's response
 assistant_message_1 = response_1.output_text
 print(f"GPT: {assistant_message_1}\n")
 
-# Step 4: Add GPT's response to history
-conversation_history.append({"role": "assistant", "content": assistant_message_1})
+# Step 4: Keep all output items, including reasoning items, for the next turn.
+conversation_history.extend(response_1.output)
 
 # =============================================================================
 # TURN 2: User asks about something from Turn 1
@@ -62,14 +65,17 @@ print(f"User: {user_message_2}")
 
 response_2 = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
+    store=False,
 )
+if response_2.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response_2.status}")
 
 assistant_message_2 = response_2.output_text
 print(f"GPT: {assistant_message_2}\n")
 
-conversation_history.append({"role": "assistant", "content": assistant_message_2})
+conversation_history.extend(response_2.output)
 
 # =============================================================================
 # TURN 3: Test memory of earlier context
@@ -86,14 +92,17 @@ print(f"User: {user_message_3}")
 
 response_3 = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
+    store=False,
 )
+if response_3.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response_3.status}")
 
 assistant_message_3 = response_3.output_text
 print(f"GPT: {assistant_message_3}\n")
 
-conversation_history.append({"role": "assistant", "content": assistant_message_3})
+conversation_history.extend(response_3.output)
 
 # =============================================================================
 # TURN 4: Ask GPT to summarize the whole conversation
@@ -110,14 +119,17 @@ print(f"User: {user_message_4}")
 
 response_4 = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
+    store=False,
 )
+if response_4.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response_4.status}")
 
 assistant_message_4 = response_4.output_text
 print(f"GPT: {assistant_message_4}\n")
 
-conversation_history.append({"role": "assistant", "content": assistant_message_4})
+conversation_history.extend(response_4.output)
 
 # =============================================================================
 # Let's look at what the history contains
@@ -127,23 +139,25 @@ print("=" * 80)
 print("FINAL CONVERSATION HISTORY:")
 print("=" * 80)
 
-for i, message in enumerate(conversation_history, 1):
-    role = message["role"].upper()
-    content = (
-        message["content"][:50] + "..."
-        if len(message["content"]) > 50
-        else message["content"]
-    )
-    print(f"{i}. {role}: {content}\n")
+for i, item in enumerate(conversation_history, 1):
+    if isinstance(item, dict):
+        label, preview = "USER", item["content"]
+    else:
+        label = item.type.upper()
+        preview = "".join(
+            block.text for block in (getattr(item, "content", None) or [])
+            if block.type == "output_text"
+        ) or "(non-text output item)"
+    print(f"{i}. {label}: {preview[:50]}\n")
 
-print(f"Total messages in history: {len(conversation_history)}")
+print(f"Total items in history: {len(conversation_history)}")
 
 """
 WHAT YOU JUST LEARNED:
 
 1. Responses API still uses the same memory concept
    - conversation_history is a plain Python list
-   - You append messages to it
+   - You append user messages and the model's output items to it
    - You send the entire list with each API call
 
 2. The AI is stateless

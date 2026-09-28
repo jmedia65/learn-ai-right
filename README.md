@@ -1,5 +1,7 @@
 # Learn AI Development Without Frameworks
 
+**Completely updated as of September 28, 2026.**
+
 **Learn AI fundamentals without frameworks. Just Python, APIs, and clarity.**
 
 ![Learn AI Right Hero Image](assets/learn_ai_right_hero.jpg)
@@ -58,11 +60,13 @@ By the end, you'll understand how production AI systems work under the hood.
 
 ## API Versions in This Repo
 
-- OpenAI examples use the **Responses API** (`client.responses.create(...)`), which is the recommended primary API for new projects.
-- Anthropic examples use the current `messages` API patterns.
+- OpenAI examples use the **Responses API** (`client.responses.create(...)`). The structured-output lesson uses `client.responses.parse(...)`.
+- Anthropic examples use the **Messages API**. The structured-output lesson uses `client.messages.parse(...)`.
 - Models are configurable via env vars:
-  - `OPENAI_MODEL` (default in examples: `gpt-4.1`)
-  - `ANTHROPIC_MODEL` (default in examples: `claude-sonnet-4-6`)
+  - `OPENAI_MODEL` (default: `gpt-6-luna` in lessons 1-9; `gpt-6-sol` in the capstone)
+  - `ANTHROPIC_MODEL` (default: `claude-sonnet-5-5` in Anthropic examples)
+
+The examples still show each API call, message list, tool request, and retrieval step directly. Newer reasoning models may return non-text items alongside text, so the lessons check completion and keep the response items needed for conversation continuity.
 
 ## Prerequisites
 
@@ -101,8 +105,8 @@ Add your API keys to `.env`:
 ANTHROPIC_API_KEY=your_anthropic_key_here
 OPENAI_API_KEY=your_openai_key_here
 # Optional:
-# ANTHROPIC_MODEL=claude-sonnet-4-6
-# OPENAI_MODEL=gpt-4.1
+# ANTHROPIC_MODEL=claude-sonnet-5-5
+# OPENAI_MODEL=gpt-6-luna
 ```
 
 Get API keys:
@@ -171,9 +175,9 @@ Build one complete AI Learning Coach that combines memory, structured outputs, t
 
 ## About
 
-I'm [Max Braglia](https://maxbraglia.com/), and I write about AI engineering at [maxbraglia.substack.com](https://maxbraglia.substack.com). I built this course because I wish it existed when I started learning AI development.
+I'm [Max Braglia](https://maxbraglia.com/), an independent operator working across marketing, web development, and applied AI. I build, market, and monetize digital assets and help businesses do the same. I built this course because I wish it existed when I started learning AI development.
 
-If you find this valuable, consider [subscribing to my newsletter](https://maxbraglia.substack.com) where I share practical AI development insights.
+I write [The Operator's Notebook](https://maxbraglia.substack.com) about marketing, engineering, and AI from inside the work: what I'm building, what's working, and what isn't. If you find this course valuable, you can follow along there.
 
 ## License
 

@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 import json
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -48,6 +48,7 @@ tools = [
     {
         "type": "function",
         "name": "get_weather",
+        "strict": True,
         "description": "Get the current weather for a specific location. Returns temperature, condition, and humidity.",
         "parameters": {
             "type": "object",
@@ -64,6 +65,7 @@ tools = [
     {
         "type": "function",
         "name": "get_user_info",
+        "strict": True,
         "description": "Get information about a user by their user ID.",
         "parameters": {
             "type": "object",
@@ -87,10 +89,18 @@ tools = [
 
 def execute_tool(tool_name: str, tool_input: dict):
     """Route tool calls to the correct Python function."""
+    if not isinstance(tool_input, dict):
+        return {"error": "Tool input must be an object"}
     if tool_name == "get_weather":
-        return get_weather(tool_input["location"])
+        location = tool_input.get("location")
+        if not isinstance(location, str):
+            return {"error": "location must be a string"}
+        return get_weather(location)
     if tool_name == "get_user_info":
-        return get_user_info(tool_input["user_id"])
+        user_id = tool_input.get("user_id")
+        if not isinstance(user_id, str):
+            return {"error": "user_id must be a string"}
+        return get_user_info(user_id)
     return {"error": f"Unknown tool: {tool_name}"}
 
 
@@ -120,8 +130,11 @@ def chat_with_tools(user_message: str, tools: list):
         input=user_message,
     )
 
-    while True:
+    while iteration < 5:
         iteration += 1
+
+        if response.status != "completed":
+            raise RuntimeError(f"Response did not complete: {response.status}")
 
         # Responses can include multiple output item types.
         # We care about function_call items during the tool loop.
@@ -135,7 +148,10 @@ def chat_with_tools(user_message: str, tools: list):
                 function_name = call.name
 
                 # Arguments arrive as a JSON string
-                function_args = json.loads(call.arguments)
+                try:
+                    function_args = json.loads(call.arguments)
+                except json.JSONDecodeError:
+                    function_args = {}
 
                 print(f"   📞 Calling: {function_name}({json.dumps(function_args)})")
 
@@ -171,6 +187,8 @@ def chat_with_tools(user_message: str, tools: list):
             print(f"{'='*80}\n")
 
             return final_answer
+
+    raise RuntimeError("Tool call limit reached before a final answer")
 
 
 # =============================================================================

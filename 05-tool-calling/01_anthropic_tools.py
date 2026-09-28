@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 import json
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # =============================================================================
@@ -53,6 +54,7 @@ def get_user_info(user_id: str) -> dict:
 tools = [
     {
         "name": "get_weather",  # Must match your function name
+        "strict": True,
         "description": "Get the current weather for a specific location. Returns temperature, condition, and humidity.",
         "input_schema": {  # Describes the parameters
             "type": "object",
@@ -63,10 +65,12 @@ tools = [
                 }
             },
             "required": ["location"],  # Which parameters are required
+            "additionalProperties": False,
         },
     },
     {
         "name": "get_user_info",
+        "strict": True,
         "description": "Get information about a user by their user ID.",
         "input_schema": {
             "type": "object",
@@ -77,6 +81,7 @@ tools = [
                 }
             },
             "required": ["user_id"],
+            "additionalProperties": False,
         },
     },
 ]
@@ -89,10 +94,18 @@ tools = [
 
 def execute_tool(tool_name: str, tool_input: dict):
     """Route tool calls to the correct Python function."""
+    if not isinstance(tool_input, dict):
+        return {"error": "Tool input must be an object"}
     if tool_name == "get_weather":
-        return get_weather(tool_input["location"])
+        location = tool_input.get("location")
+        if not isinstance(location, str):
+            return {"error": "location must be a string"}
+        return get_weather(location)
     elif tool_name == "get_user_info":
-        return get_user_info(tool_input["user_id"])
+        user_id = tool_input.get("user_id")
+        if not isinstance(user_id, str):
+            return {"error": "user_id must be a string"}
+        return get_user_info(user_id)
     else:
         return {"error": f"Unknown tool: {tool_name}"}
 
@@ -122,13 +135,13 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
     iteration = 0
 
     # Loop until Claude stops using tools
-    while True:
+    while iteration < 5:
         iteration += 1
 
         # Call Claude with tools available
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=1024,
+            model=MODEL,
+            max_tokens=4096,
             tools=tools,  # <-- Provide the tool schemas
             messages=conversation_history,
         )
@@ -171,7 +184,7 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
 
             # Loop continues - Claude will see the tool results
 
-        else:  # stop_reason is "end_turn" or "max_tokens"
+        elif response.stop_reason == "end_turn":
             # Claude has a final answer (no more tools needed)
             print(f"✨ ITERATION {iteration}: Claude has final answer\n")
 
@@ -183,7 +196,11 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
             # print(conversation_history)
 
             # Extract the text response
-            final_answer = response.content[0].text
+            final_answer = "".join(
+                block.text for block in response.content if block.type == "text"
+            )
+            if not final_answer:
+                raise RuntimeError("Claude returned no final text")
 
             print(f"{'='*80}")
             print("CLAUDE'S FINAL ANSWER:")
@@ -192,6 +209,11 @@ def chat_with_tools(user_message: str, tools: list, conversation_history: list):
             print(f"{'='*80}\n")
 
             return final_answer
+
+        else:
+            raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+
+    raise RuntimeError("Tool call limit reached before a final answer")
 
 
 # =============================================================================

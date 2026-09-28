@@ -12,7 +12,18 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+def response_text(response):
+    """Read the visible answer, checking that Claude finished its turn."""
+    if response.stop_reason != "end_turn":
+        raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+    answer = "".join(block.text for block in response.content if block.type == "text")
+    if not answer:
+        raise RuntimeError("Claude returned no text")
+    return answer
+
 
 # This is your "memory" - just a Python list
 # It will hold all user and assistant messages
@@ -35,13 +46,13 @@ print(f"User: {user_message_1}")
 # Step 2: Send the ENTIRE conversation history
 # Right now it's just one message, but we always send the full list
 response_1 = client.messages.create(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=conversation_history,  # <-- The whole history goes here
 )
 
 # Step 3: Extract Claude's response
-assistant_message_1 = response_1.content[0].text
+assistant_message_1 = response_text(response_1)
 print(f"Claude: {assistant_message_1}\n")
 
 # Step 4: Add Claude's response to history
@@ -65,12 +76,12 @@ print(f"User: {user_message_2}")
 # Send the ENTIRE conversation history again
 # Claude sees all 3 messages, so it knows the user's name is Alex
 response_2 = client.messages.create(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=conversation_history,  # <-- Still just sending the list
 )
 
-assistant_message_2 = response_2.content[0].text
+assistant_message_2 = response_text(response_2)
 print(f"Claude: {assistant_message_2}\n")
 
 # Add Claude's response (now 4 messages: user, assistant, user, assistant)
@@ -91,10 +102,10 @@ print(f"User: {user_message_3}")
 
 # Send the ENTIRE history (now 5 messages)
 response_3 = client.messages.create(
-    model="claude-sonnet-4-6", max_tokens=1024, messages=conversation_history
+    model=MODEL, max_tokens=4096, messages=conversation_history
 )
 
-assistant_message_3 = response_3.content[0].text
+assistant_message_3 = response_text(response_3)
 print(f"Claude: {assistant_message_3}\n")
 
 conversation_history.append({"role": "assistant", "content": assistant_message_3})
@@ -113,10 +124,10 @@ conversation_history.append({"role": "user", "content": user_message_4})
 print(f"User: {user_message_4}")
 
 response_4 = client.messages.create(
-    model="claude-sonnet-4-6", max_tokens=1024, messages=conversation_history
+    model=MODEL, max_tokens=4096, messages=conversation_history
 )
 
-assistant_message_4 = response_4.content[0].text
+assistant_message_4 = response_text(response_4)
 print(f"Claude: {assistant_message_4}\n")
 
 conversation_history.append({"role": "assistant", "content": assistant_message_4})

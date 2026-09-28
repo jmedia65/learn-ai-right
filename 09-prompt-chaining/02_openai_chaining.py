@@ -10,7 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -35,7 +35,7 @@ def research_write_edit(topic: str) -> str:
 
     research_response = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         input=f"""Research this topic and provide:
 - 5 key facts
 - Main benefits
@@ -46,6 +46,8 @@ Topic: {topic}
 
 Be concise and factual.""",
     )
+    if research_response.status != "completed":
+        raise RuntimeError(f"Research did not complete: {research_response.status}")
 
     research = research_response.output_text
     print(f"✓ Research complete ({len(research)} characters)\n")
@@ -57,13 +59,15 @@ Be concise and factual.""",
 
     draft_response = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         input=f"""Based on this research, write a 200-word article:
 
 {research}
 
 Make it engaging and accessible to beginners.""",
     )
+    if draft_response.status != "completed":
+        raise RuntimeError(f"Draft did not complete: {draft_response.status}")
 
     draft = draft_response.output_text
     print(f"✓ Draft complete ({len(draft)} characters)\n")
@@ -76,7 +80,7 @@ Make it engaging and accessible to beginners.""",
     final = ""
     stream = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         input=f"""Edit this article for clarity and flow:
 
 {draft}
@@ -86,10 +90,18 @@ Output ONLY the final article, no commentary.""",
         stream=True,
     )
 
+    completed = False
     for event in stream:
         if event.type == "response.output_text.delta":
             print(event.delta, end="", flush=True)
             final += event.delta
+        elif event.type == "response.completed":
+            completed = True
+        elif event.type in ("response.failed", "response.incomplete", "error"):
+            raise RuntimeError(f"Edit stream ended with {event.type}")
+
+    if not completed:
+        raise RuntimeError("Edit stream ended before response.completed")
 
     print("\n\n✓ Editing complete\n")
 
@@ -118,7 +130,7 @@ def handle_support_request(user_message: str) -> str:
 
     classification_response = client.responses.create(
         model=MODEL,
-        max_output_tokens=100,
+        max_output_tokens=4096,
         input=f"""Classify this user message into ONE category:
 - bug_report
 - feature_request
@@ -129,6 +141,8 @@ User message: {user_message}
 
 Output ONLY the category name, nothing else.""",
     )
+    if classification_response.status != "completed":
+        raise RuntimeError(f"Classification did not complete: {classification_response.status}")
 
     category = classification_response.output_text.strip()
     print(f"✓ Classified as: {category}\n")
@@ -140,7 +154,7 @@ Output ONLY the category name, nothing else.""",
     if category == "bug_report":
         response = client.responses.create(
             model=MODEL,
-            max_output_tokens=500,
+            max_output_tokens=4096,
             input=f"""You're a support engineer. Respond to this bug report:
 
 {user_message}
@@ -153,7 +167,7 @@ Output ONLY the category name, nothing else.""",
     elif category == "feature_request":
         response = client.responses.create(
             model=MODEL,
-            max_output_tokens=500,
+            max_output_tokens=4096,
             input=f"""You're a product manager. Respond to this feature request:
 
 {user_message}
@@ -166,7 +180,7 @@ Output ONLY the category name, nothing else.""",
     else:
         response = client.responses.create(
             model=MODEL,
-            max_output_tokens=500,
+            max_output_tokens=4096,
             input=f"""You're a helpful support agent. Respond to:
 
 {user_message}
@@ -174,6 +188,8 @@ Output ONLY the category name, nothing else.""",
 Be friendly, helpful, and provide actionable next steps.""",
         )
 
+    if response.status != "completed":
+        raise RuntimeError(f"Support response did not complete: {response.status}")
     final_response = response.output_text
     print("✓ Response generated\n")
 

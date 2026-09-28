@@ -10,10 +10,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# This is your "memory" - just a Python list
+# This is your "memory" - a Python list of user messages and response items.
 conversation_history = []
 
 print("Chat with GPT! (Type 'quit' to exit)")
@@ -38,9 +38,12 @@ while True:
     # Step 2: Send full history to GPT
     response = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         input=conversation_history,
+        store=False,
     )
+    if response.status != "completed":
+        raise RuntimeError(f"Response did not complete: {response.status}")
 
     # Step 3: Extract GPT's response
     assistant_message = response.output_text
@@ -48,8 +51,8 @@ while True:
     # Step 4: Display the response
     print(f"\nGPT: {assistant_message}")
 
-    # Step 5: Add GPT's response to history
-    conversation_history.append({"role": "assistant", "content": assistant_message})
+    # Step 5: Keep all output items, including reasoning items, for the next turn
+    conversation_history.extend(response.output)
 
     # The loop repeats! Back to Step 1 with an updated history
 
@@ -66,7 +69,7 @@ WHAT YOU JUST LEARNED:
    Step 2: Send entire history to API
    Step 3: Extract the response
    Step 4: Display it to the user
-   Step 5: Append assistant message to history
+   Step 5: Append all assistant output items to history
 
 3. This works for ANY conversation-based AI app
    - Customer support bots

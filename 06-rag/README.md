@@ -23,6 +23,7 @@ Find relevant documents, include them in your prompt, and ask the AI to answer b
 - [sample_documents.py](./sample_documents.py) - Sample document collection
 
 Both examples use the same simple keyword search and document set.
+They check that generation finished before using the answer; retrieval remains plain Python.
 
 ## Key Takeaway
 

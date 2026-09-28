@@ -4,7 +4,7 @@
 
 AI conversation memory is simpler than it sounds: **it's just a Python list**.
 
-LLMs like Claude and GPT are stateless—they have no memory between API calls. The illusion of memory works because you send the complete conversation history with every request. That's it. No complex architecture, no special databases, just a list of messages.
+LLMs like Claude and GPT have no memory between independent API calls. Conversation continuity works because you send the history with every request. That's it. No complex architecture or special database—just a Python list. For OpenAI reasoning models, that list includes the model's full output items as well as user messages. Append the SDK's `response.output` items directly so optional fields are serialized correctly on the next call.
 
 ## What You'll Learn
 
@@ -40,7 +40,7 @@ Every chatbot, from ChatGPT to custom applications, follows this simple loop:
 2. Send entire history to API
 3. Extract the response
 4. Display it
-5. Append assistant message to history
+5. Append the assistant response to history (all output items in the OpenAI examples)
 
 **Turn-by-turn examples:** Pattern repeated 4 times with hardcoded messages
 **While loop examples:** Pattern wrapped in `while True:` with user input
@@ -50,15 +50,15 @@ That's it. No magic. Just a Python list and sequential API calls.
 ## Quick Exercise (10 Minutes)
 
 1. Add a fifth turn: ask "What are my interests so far?"
-2. Print `len(conversation_history)` after each turn.
-3. Keep only the most recent 6 messages and compare answer quality.
+2. Print `len(conversation_history)` after each turn. OpenAI may add more than one output item per turn.
+3. Compare a short conversation with a longer one and note the token cost.
 
 Done when: you can show the tradeoff between context quality and token cost.
 
 ## What Breaks in Production
 
 - History grows forever: context-window and cost blow up.
-- Missing assistant messages: memory quality drops sharply.
+- Missing assistant output items: reasoning context can be lost.
 - No truncation strategy: long chats become slow and expensive.
 
 ## Next Step

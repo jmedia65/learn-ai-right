@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 # This is where your API keys are stored
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 
 # Step 1: Initialize the client
 # This sets up authentication with Anthropic's API
@@ -22,8 +23,8 @@ client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 # Step 2: Call the API
 # Send a messages array to Claude
 response = client.messages.create(
-    model="claude-sonnet-4-6",  # Which AI model to use
-    max_tokens=1024,  # Maximum length of response (~750-1000 words)
+    model=MODEL,  # Which AI model to use
+    max_tokens=4096,  # Includes any thinking tokens and the visible answer
     messages=[
         {
             "role": "user",  # Who is speaking (user or assistant)
@@ -33,8 +34,12 @@ response = client.messages.create(
 )
 
 # Step 3: Extract the response
-# The actual text is nested in response.content[0].text
-answer = response.content[0].text
+# A response can start with a thinking block, so select text blocks by type.
+if response.stop_reason != "end_turn":
+    raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+answer = "".join(block.text for block in response.content if block.type == "text")
+if not answer:
+    raise RuntimeError("Claude returned no text")
 
 # Display the AI's response
 print("=" * 80)
@@ -61,7 +66,7 @@ WHAT YOU JUST LEARNED:
    - And "content" (the actual text)
 
 2. The response object contains more than just the answer
-   - response.content[0].text = the actual response
+   - response.content contains blocks; select the text blocks for the answer
    - response.model = which model was used
    - response.usage = token counts for billing
 

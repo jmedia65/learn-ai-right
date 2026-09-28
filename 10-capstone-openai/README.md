@@ -3,6 +3,7 @@
 ## Goal
 
 Build one end-to-end assistant that combines all previous steps into a practical project.
+It defaults to `gpt-6-sol`; set `OPENAI_MODEL` to use another compatible model.
 
 ## What This Capstone Combines
 
@@ -15,6 +16,8 @@ Build one end-to-end assistant that combines all previous steps into a practical
 7. **Conversational RAG** - follow-up questions with memory + fresh retrieval
 8. **Streaming** - event-based real-time final response
 9. **Prompt chaining** - plan -> answer -> polish
+
+The tool schemas are strict, Python validates their arguments, and the loop has a round limit. Each stage checks completion before passing data onward.
 
 ## Files
 

@@ -9,7 +9,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 print("Chat with GPT using previous_response_id! (Type 'quit' to exit)")
@@ -26,7 +26,7 @@ while True:
 
     request_args = {
         "model": MODEL,
-        "max_output_tokens": 500,
+        "max_output_tokens": 4096,
         "input": user_input,
     }
 
@@ -34,6 +34,8 @@ while True:
         request_args["previous_response_id"] = previous_response_id
 
     response = client.responses.create(**request_args)
+    if response.status != "completed":
+        raise RuntimeError(f"Response did not complete: {response.status}")
 
     print(f"\nGPT: {response.output_text}")
 

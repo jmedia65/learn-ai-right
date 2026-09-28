@@ -32,6 +32,7 @@ Common prompt chaining patterns:
 - **Parallel chains**: Multiple analyses → Combine results
 
 All of these are just API calls with Python logic between them.
+Each step checks completion before passing its output to the next step, including the streamed edit.
 
 ## Quick Exercise (10 Minutes)
 

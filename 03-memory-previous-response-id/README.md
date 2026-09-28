@@ -10,7 +10,7 @@ You can chain responses without manually re-sending the full message list.
 ## Why This Step Exists
 
 - Step 2 taught the **stateless truth** (you control memory).
-- Step 3 teaches a **modern convenience** (SDK-assisted conversation state).
+- Step 3 teaches a **modern convenience** (server-side response chaining).
 
 You should understand both.
 
@@ -28,6 +28,7 @@ You should understand both.
 ## Key Takeaway
 
 `previous_response_id` is not magic memory. It is a convenience API for conversation chaining.
+The linked responses are stored by the API. Earlier input tokens in the chain still count toward later requests, so chaining does not make long conversations free.
 
 ## Quick Exercise (10 Minutes)
 

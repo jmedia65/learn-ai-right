@@ -19,13 +19,12 @@ If students skip structure, tool calling and workflows feel brittle fast.
 
 - Why plain-text prompting is fragile for production logic
 - How to define output schemas with `pydantic`
-- How OpenAI's Responses API can parse directly into typed objects
-- How to validate Anthropic JSON outputs with schema checks
+- How both SDKs parse schema-constrained output directly into Pydantic objects
 - How structured outputs improve chaining, routing, and evaluation
 
 ## Files in This Module
 
-- [01_anthropic_structured_output.py](./01_anthropic_structured_output.py) - Claude + JSON + pydantic validation
+- [01_anthropic_structured_output.py](./01_anthropic_structured_output.py) - Claude `messages.parse` + Pydantic validation
 - [02_openai_structured_output.py](./02_openai_structured_output.py) - Responses API parsing into typed objects
 
 ## Key Takeaway
@@ -38,8 +37,8 @@ Structured outputs are often the missing step between beginner demos and real ap
 ## Quick Exercise (10 Minutes)
 
 1. Add a new field to the schema, e.g. `estimated_minutes: int`.
-2. Update the prompt so the model must provide it.
-3. Intentionally break one field type and observe validation failure.
+2. Run both scripts and inspect the typed result.
+3. Pass an invalid value to `LessonSummary.model_validate(...)` locally and observe the validation error.
 
 Done when: your code rejects invalid output instead of silently accepting it.
 
@@ -48,7 +47,7 @@ Done when: your code rejects invalid output instead of silently accepting it.
 - Schema drift: prompts and validators stop matching.
 - Trusting raw JSON: malformed outputs break downstream logic.
 - Weak constraints: free-form values reduce reliability.
-- Some providers may wrap JSON in markdown fences (```json ... ```), so you may need a small cleanup step before `json.loads()`.
+- An incomplete or refused response may not contain a parsed result, so check completion before using it.
 
 ## Next Step
 

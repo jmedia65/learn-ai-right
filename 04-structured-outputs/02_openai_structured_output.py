@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -38,6 +38,8 @@ Lesson text:
 """,
     text_format=LessonSummary,
 )
+if response.status != "completed" or response.output_parsed is None:
+    raise RuntimeError(f"Structured response did not complete: {response.status}")
 
 summary = response.output_parsed
 

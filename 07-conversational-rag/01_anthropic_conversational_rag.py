@@ -14,7 +14,18 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+def response_text(response):
+    """Read the visible answer, checking that Claude finished its turn."""
+    if response.stop_reason != "end_turn":
+        raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+    answer = "".join(block.text for block in response.content if block.type == "text")
+    if not answer:
+        raise RuntimeError("Claude returned no text")
+    return answer
+
 
 # =============================================================================
 # SAMPLE DOCUMENTS (same as module 06)
@@ -142,13 +153,13 @@ Instructions:
     print("🤖 Asking Claude...\n")
 
     response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+        model=MODEL,
+        max_tokens=4096,
         system=system_prompt,  # Documents go here (refreshed each turn)
         messages=conversation_history,  # Conversation history goes here
     )
 
-    answer = response.content[0].text
+    answer = response_text(response)
 
     # STEP 6: Add Claude's response to history
     conversation_history.append({"role": "assistant", "content": answer})

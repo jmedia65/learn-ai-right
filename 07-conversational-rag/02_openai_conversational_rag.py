@@ -10,7 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -84,7 +84,7 @@ def conversational_rag(question: str, documents: list, conversation_history: lis
     1. Retrieve docs for THIS question
     2. Build instructions from retrieved docs
     3. Send full conversation history + new question
-    4. Append user + assistant messages to history
+    4. Append the user message and all response output items to history
     """
 
     print(f"\n{'='*80}")
@@ -130,16 +130,19 @@ Instructions:
     print("🤖 Asking GPT...\n")
     response = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         instructions=instructions,
         input=input_messages,
+        store=False,
     )
+    if response.status != "completed":
+        raise RuntimeError(f"Response did not complete: {response.status}")
 
     answer = response.output_text
 
-    # STEP 4: Add user question and response to memory
+    # STEP 4: Keep all output items, including reasoning items, in memory
     conversation_history.append({"role": "user", "content": question})
-    conversation_history.append({"role": "assistant", "content": answer})
+    conversation_history.extend(response.output)
 
     return answer, conversation_history
 

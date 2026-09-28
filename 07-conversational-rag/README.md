@@ -31,7 +31,7 @@ Conversational RAG pattern:
 3. Build system prompt with retrieved documents
 4. **Send full conversation history** (for context)
 5. AI uses both documents AND conversation to answer
-6. Add response to conversation history
+6. Add response to conversation history (all OpenAI output items for reasoning continuity)
 7. Repeat
 
 Fresh documents + conversation memory = natural follow-up questions.

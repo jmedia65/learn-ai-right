@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Optional model override for experiments
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 
 # Step 1: Initialize the client
 # This sets up authentication with OpenAI's API
@@ -26,9 +26,11 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # For simple text tasks, input can be a plain string
 response = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,  # Maximum length of response
+    max_output_tokens=4096,  # Maximum length of response
     input="Explain what an API is in one sentence.",
 )
+if response.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response.status}")
 
 # Step 3: Extract the response
 # Responses API exposes a convenience field for final text

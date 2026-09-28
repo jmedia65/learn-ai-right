@@ -13,7 +13,18 @@ from dotenv import load_dotenv
 from sample_documents import DOCUMENTS
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+def response_text(response):
+    """Read the visible answer, checking that Claude finished its turn."""
+    if response.stop_reason != "end_turn":
+        raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+    answer = "".join(block.text for block in response.content if block.type == "text")
+    if not answer:
+        raise RuntimeError("Claude returned no text")
+    return answer
+
 
 # =============================================================================
 # STEP 1: RETRIEVAL - Simple keyword search
@@ -129,12 +140,12 @@ Instructions:
 
     # Call Claude (just a normal API call!)
     response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+        model=MODEL,
+        max_tokens=4096,
         messages=[{"role": "user", "content": prompt}],
     )
 
-    answer = response.content[0].text
+    answer = response_text(response)
 
     print(f"✅ Answer generated!\n")
 

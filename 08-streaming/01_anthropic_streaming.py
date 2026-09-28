@@ -13,6 +13,7 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 # =============================================================================
@@ -28,13 +29,15 @@ print("Claude (non-streaming): ", end="", flush=True)
 
 # Regular API call - we've been using this pattern
 response = client.messages.create(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 )
 
 # All text arrives at once
-print(response.content[0].text)
+if response.stop_reason != "end_turn":
+    raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+print("".join(block.text for block in response.content if block.type == "text"))
 print("\n^ Notice: Full response appeared at once (after waiting)")
 
 # =============================================================================
@@ -51,8 +54,8 @@ print("Claude (streaming): ", end="", flush=True)
 # The only change: Use .stream() instead of .create()
 # Wrap in a context manager (with statement) for proper cleanup
 with client.messages.stream(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=[{"role": "user", "content": "Explain Python in two sentences."}],
 ) as stream:
     # stream.text_stream yields chunks as they arrive
@@ -60,6 +63,10 @@ with client.messages.stream(
         # chunk is a small piece of text (word, part of a word, or punctuation)
         # flush=True forces immediate display (bypasses Python's output buffering)
         print(chunk, end="", flush=True)
+    final_message = stream.get_final_message()
+
+if final_message.stop_reason != "end_turn":
+    raise RuntimeError(f"Claude did not finish its answer: {final_message.stop_reason}")
 
 print("\n\n^ Notice: Text appeared gradually as Claude generated it!")
 
@@ -86,18 +93,22 @@ print("Claude: ", end="", flush=True)
 full_response = ""  # We'll build the complete response here
 
 with client.messages.stream(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=conversation_history,
 ) as stream:
     for chunk in stream.text_stream:
         print(chunk, end="", flush=True)  # Display in real-time
         full_response += chunk  # Accumulate for conversation history
+    final_message = stream.get_final_message()
+
+if final_message.stop_reason != "end_turn":
+    raise RuntimeError(f"Claude did not finish its answer: {final_message.stop_reason}")
 
 print()  # Newline after streaming completes
 
-# Add Claude's complete response to history
-conversation_history.append({"role": "assistant", "content": full_response})
+# Keep every content block, including any thinking blocks, for continuity.
+conversation_history.append({"role": "assistant", "content": final_message.content})
 
 # Now we can ask a follow-up question
 print("\nUser: Who created it?\n")
@@ -108,17 +119,21 @@ print("Claude: ", end="", flush=True)
 full_response_2 = ""
 
 with client.messages.stream(
-    model="claude-sonnet-4-6",
-    max_tokens=1024,
+    model=MODEL,
+    max_tokens=4096,
     messages=conversation_history,
 ) as stream:
     for chunk in stream.text_stream:
         print(chunk, end="", flush=True)
         full_response_2 += chunk
+    final_message = stream.get_final_message()
+
+if final_message.stop_reason != "end_turn":
+    raise RuntimeError(f"Claude did not finish its answer: {final_message.stop_reason}")
 
 print("\n")
 
-conversation_history.append({"role": "assistant", "content": full_response_2})
+conversation_history.append({"role": "assistant", "content": final_message.content})
 
 print("=" * 80)
 print(f"Conversation has {len(conversation_history)} messages")
@@ -139,7 +154,7 @@ WHAT YOU JUST LEARNED:
 3. You can stream AND save for history
    - Display chunks immediately: print(chunk, ...)
    - Accumulate them: full_response += chunk
-   - Add complete response to conversation_history after streaming
+   - Add complete response blocks to conversation_history after streaming
 
 4. When to use streaming:
    - Interactive applications (chatbots, web interfaces)

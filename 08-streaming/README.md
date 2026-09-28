@@ -12,7 +12,7 @@ Streaming makes AI responses appear word-by-word in real-time instead of waiting
 
 - The difference between non-streaming and streaming responses
 - How to display text chunks in real-time with `flush=True`
-- How to accumulate the full response while streaming for conversation history
+- How to accumulate visible text and keep the completed response for conversation history
 - When to use streaming vs. non-streaming
 
 ## Files in This Module
@@ -24,11 +24,12 @@ Both examples compare non-streaming vs. streaming side-by-side.
 
 ## Key Takeaway
 
-Streaming in three steps:
+Streaming in four steps:
 
 1. Enable streaming (`client.messages.stream(...)` for Anthropic, `stream=True` for OpenAI Responses)
 2. Iterate through chunks/events as they arrive
 3. Print immediately with `flush=True` to bypass Python's output buffering
+4. Check the final completion event or message before saving the response to history
 
 The total processing time is similar, but the user experience is dramatically better.
 
@@ -36,14 +37,14 @@ The total processing time is similar, but the user experience is dramatically be
 
 1. Time non-streaming vs streaming with `time.perf_counter()`.
 2. Record time-to-first-text and total completion time.
-3. Keep accumulating full text and append it to conversation history.
+3. Accumulate visible text, then inspect the completed response items saved to history.
 
 Done when: you can quantify UX improvement even when total latency is similar.
 
 ## What Breaks in Production
 
 - Dropped stream events: partial outputs shown to users.
-- No final accumulation: follow-up context is incomplete.
+- No completion check: partial output can be mistaken for a finished answer.
 - Backpressure issues: UI freezes on long streams.
 
 ## Next Step

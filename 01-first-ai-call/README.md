@@ -9,6 +9,7 @@ Every AI application follows the same foundational pattern: **initialize a clien
 - How to make your first API call to Claude (Anthropic) and GPT (OpenAI Responses API)
 - The anatomy of a request: model, tokens, and input/messages
 - How to extract the AI's response from the API response object
+- Why Claude text must be selected by block type and incomplete responses must be checked
 - What metadata the API returns (token usage, stop reasons, model info)
 
 ## Files in This Module

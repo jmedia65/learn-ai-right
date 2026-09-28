@@ -10,7 +10,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -26,9 +26,11 @@ print("GPT (non-streaming): ", end="", flush=True)
 
 response = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input="Explain Python in two sentences.",
 )
+if response.status != "completed":
+    raise RuntimeError(f"Response did not complete: {response.status}")
 
 print(response.output_text)
 print("\n^ Notice: Full response appeared at once (after waiting)")
@@ -47,14 +49,22 @@ print("GPT (streaming): ", end="", flush=True)
 # The key change: stream=True and iterate events
 stream = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input="Explain Python in two sentences.",
     stream=True,
 )
 
+completed_response = None
 for event in stream:
     if event.type == "response.output_text.delta":
         print(event.delta, end="", flush=True)
+    elif event.type == "response.completed":
+        completed_response = event.response
+    elif event.type in ("response.failed", "response.incomplete", "error"):
+        raise RuntimeError(f"Stream ended with {event.type}")
+
+if completed_response is None:
+    raise RuntimeError("Stream ended before response.completed")
 
 print("\n\n^ Notice: Text appeared gradually as GPT generated it!")
 
@@ -81,19 +91,29 @@ full_response = ""
 
 stream = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
     stream=True,
+    store=False,
 )
 
+completed_response = None
 for event in stream:
     if event.type == "response.output_text.delta":
         print(event.delta, end="", flush=True)
         full_response += event.delta
+    elif event.type == "response.completed":
+        completed_response = event.response
+    elif event.type in ("response.failed", "response.incomplete", "error"):
+        raise RuntimeError(f"Stream ended with {event.type}")
+
+if completed_response is None:
+    raise RuntimeError("Stream ended before response.completed")
 
 print()
 
-conversation_history.append({"role": "assistant", "content": full_response})
+# Replay every output item so reasoning models retain their full context.
+conversation_history.extend(completed_response.output)
 
 print("\nUser: Who created it?\n")
 conversation_history.append({"role": "user", "content": "Who created it?"})
@@ -104,22 +124,31 @@ full_response_2 = ""
 
 stream = client.responses.create(
     model=MODEL,
-    max_output_tokens=1024,
+    max_output_tokens=4096,
     input=conversation_history,
     stream=True,
+    store=False,
 )
 
+completed_response = None
 for event in stream:
     if event.type == "response.output_text.delta":
         print(event.delta, end="", flush=True)
         full_response_2 += event.delta
+    elif event.type == "response.completed":
+        completed_response = event.response
+    elif event.type in ("response.failed", "response.incomplete", "error"):
+        raise RuntimeError(f"Stream ended with {event.type}")
+
+if completed_response is None:
+    raise RuntimeError("Stream ended before response.completed")
 
 print("\n")
 
-conversation_history.append({"role": "assistant", "content": full_response_2})
+conversation_history.extend(completed_response.output)
 
 print("=" * 80)
-print(f"Conversation has {len(conversation_history)} messages")
+print(f"Conversation has {len(conversation_history)} input/output items")
 print("=" * 80)
 
 """
@@ -136,7 +165,7 @@ WHAT YOU JUST LEARNED:
 
 3. Streaming + memory works cleanly
    - Show text in real-time for UX
-   - Save full text to conversation_history after stream completes
+   - Save all response output items to conversation_history after completion
 
 NEXT STEP: Learn prompt chaining to build multi-step workflows
 """

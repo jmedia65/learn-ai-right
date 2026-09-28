@@ -12,7 +12,18 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5-5")
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+def response_text(response):
+    """Read the visible answer, checking that Claude finished its turn."""
+    if response.stop_reason != "end_turn":
+        raise RuntimeError(f"Claude did not finish its answer: {response.stop_reason}")
+    answer = "".join(block.text for block in response.content if block.type == "text")
+    if not answer:
+        raise RuntimeError("Claude returned no text")
+    return answer
+
 
 # =============================================================================
 # EXAMPLE 1: LINEAR CHAIN (Research → Write → Edit)
@@ -38,8 +49,8 @@ def research_write_edit(topic: str) -> str:
     print("-" * 80)
 
     research_response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+        model=MODEL,
+        max_tokens=4096,
         messages=[
             {
                 "role": "user",
@@ -56,7 +67,7 @@ Be concise and factual.""",
         ],
     )
 
-    research = research_response.content[0].text
+    research = response_text(research_response)
     print(f"✓ Research complete ({len(research)} characters)\n")
     print(f"Preview: {research[:200]}...\n")
 
@@ -66,8 +77,8 @@ Be concise and factual.""",
     print("-" * 80)
 
     draft_response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+        model=MODEL,
+        max_tokens=4096,
         messages=[
             {
                 "role": "user",
@@ -80,7 +91,7 @@ Make it engaging and accessible to beginners.""",
         ],
     )
 
-    draft = draft_response.content[0].text
+    draft = response_text(draft_response)
     print(f"✓ Draft complete ({len(draft)} characters)\n")
     print(f"Preview: {draft[:200]}...\n")
 
@@ -91,8 +102,8 @@ Make it engaging and accessible to beginners.""",
 
     final = ""
     with client.messages.stream(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+        model=MODEL,
+        max_tokens=4096,
         messages=[
             {
                 "role": "user",
@@ -108,6 +119,10 @@ Output ONLY the final article, no commentary.""",
         for text in stream.text_stream:
             print(text, end="", flush=True)
             final += text
+        final_message = stream.get_final_message()
+
+    if final_message.stop_reason != "end_turn":
+        raise RuntimeError(f"Claude did not finish its edit: {final_message.stop_reason}")
 
     print("\n\n✓ Editing complete\n")
 
@@ -140,8 +155,8 @@ def handle_support_request(user_message: str) -> str:
     print("-" * 80)
 
     classification_response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=100,
+        model=MODEL,
+        max_tokens=4096,
         messages=[
             {
                 "role": "user",
@@ -158,7 +173,7 @@ Output ONLY the category name, nothing else.""",
         ],
     )
 
-    category = classification_response.content[0].text.strip()
+    category = response_text(classification_response).strip()
     print(f"✓ Classified as: {category}\n")
 
     # STEP 2: Branch based on classification
@@ -169,8 +184,8 @@ Output ONLY the category name, nothing else.""",
     if category == "bug_report":
         # Handle bug reports
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=500,
+            model=MODEL,
+            max_tokens=4096,
             messages=[
                 {
                     "role": "user",
@@ -188,8 +203,8 @@ Output ONLY the category name, nothing else.""",
     elif category == "feature_request":
         # Handle feature requests
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=500,
+            model=MODEL,
+            max_tokens=4096,
             messages=[
                 {
                     "role": "user",
@@ -207,8 +222,8 @@ Output ONLY the category name, nothing else.""",
     else:
         # Default handler for other categories
         response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=500,
+            model=MODEL,
+            max_tokens=4096,
             messages=[
                 {
                     "role": "user",
@@ -221,7 +236,7 @@ Be friendly, helpful, and provide actionable next steps.""",
             ],
         )
 
-    final_response = response.content[0].text
+    final_response = response_text(response)
     print(f"✓ Response generated\n")
 
     return final_response

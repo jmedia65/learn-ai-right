@@ -21,7 +21,7 @@ from openai import OpenAI
 from pydantic import BaseModel, Field
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-sol")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
@@ -135,10 +135,18 @@ def suggest_next_module(completed_modules: list[str]) -> dict:
 
 
 def execute_tool(name: str, args: dict) -> dict:
+    if not isinstance(args, dict):
+        return {"error": "Tool input must be an object"}
     if name == "get_module_info":
-        return get_module_info(args["module_id"])
+        module_id = args.get("module_id")
+        if not isinstance(module_id, str):
+            return {"error": "module_id must be a string"}
+        return get_module_info(module_id)
     if name == "suggest_next_module":
-        return suggest_next_module(args["completed_modules"])
+        completed = args.get("completed_modules")
+        if not isinstance(completed, list) or not all(isinstance(x, str) for x in completed):
+            return {"error": "completed_modules must be a list of strings"}
+        return suggest_next_module(completed)
     return {"error": f"Unknown tool: {name}"}
 
 
@@ -146,6 +154,7 @@ tools = [
     {
         "type": "function",
         "name": "get_module_info",
+        "strict": True,
         "description": "Return curriculum details for a module id (e.g. '05').",
         "parameters": {
             "type": "object",
@@ -159,6 +168,7 @@ tools = [
     {
         "type": "function",
         "name": "suggest_next_module",
+        "strict": True,
         "description": "Suggest the next module based on completed module ids.",
         "parameters": {
             "type": "object",
@@ -199,6 +209,8 @@ User message:
 Return structured output only.""",
         text_format=IntentRoute,
     )
+    if response.status != "completed" or response.output_parsed is None:
+        raise RuntimeError(f"Intent classification did not complete: {response.status}")
     return response.output_parsed
 
 
@@ -241,9 +253,11 @@ Return short bullets only."""
     plan_response = client.responses.create(
         model=MODEL,
         input=plan_prompt,
-        max_output_tokens=250,
+        max_output_tokens=8192,
         previous_response_id=previous_response_id,
     )
+    if plan_response.status != "completed":
+        raise RuntimeError(f"Plan did not complete: {plan_response.status}")
 
     plan_text = plan_response.output_text
     print("\n[3] Plan generated:")
@@ -271,7 +285,9 @@ Be practical and concise."""
         previous_response_id=plan_response.id,
     )
 
-    while True:
+    for _ in range(5):
+        if response.status != "completed":
+            raise RuntimeError(f"Answer did not complete: {response.status}")
         function_calls = [item for item in response.output if item.type == "function_call"]
         if not function_calls:
             break
@@ -280,7 +296,10 @@ Be practical and concise."""
         print("\n[4] Tool calls:")
 
         for call in function_calls:
-            args = json.loads(call.arguments)
+            try:
+                args = json.loads(call.arguments)
+            except json.JSONDecodeError:
+                args = {}
             result = execute_tool(call.name, args)
             print(f"- {call.name}({args}) -> {result}")
 
@@ -298,6 +317,8 @@ Be practical and concise."""
             input=tool_outputs,
             previous_response_id=response.id,
         )
+    else:
+        raise RuntimeError("Tool call limit reached before a final answer")
 
     draft_answer = response.output_text
 
@@ -319,7 +340,7 @@ Draft:
         model=MODEL,
         input=polish_prompt,
         previous_response_id=response.id,
-        max_output_tokens=500,
+        max_output_tokens=8192,
         stream=True,
     )
 
@@ -330,6 +351,11 @@ Draft:
             final_text += event.delta
         elif event.type == "response.completed":
             final_response_id = event.response.id
+        elif event.type in ("response.failed", "response.incomplete", "error"):
+            raise RuntimeError(f"Final stream ended with {event.type}")
+
+    if final_response_id is None:
+        raise RuntimeError("Final stream ended before response.completed")
 
     print("\n")
     return final_response_id, final_text

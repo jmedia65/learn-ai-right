@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from sample_documents import DOCUMENTS
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-6-luna")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # =============================================================================
@@ -105,9 +105,11 @@ Instructions:
 
     response = client.responses.create(
         model=MODEL,
-        max_output_tokens=1024,
+        max_output_tokens=4096,
         input=prompt,
     )
+    if response.status != "completed":
+        raise RuntimeError(f"Response did not complete: {response.status}")
 
     answer = response.output_text
 
